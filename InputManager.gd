@@ -59,7 +59,7 @@ func _unhandled_input(event):
 				only_touch = event
 				if touch_delay_timer.is_stopped(): touch_delay_timer.start(TOUCH_DELAY_TIME)
 			else:
-				start_gesture()
+				start_complex_gesture()
 				drag_enabled = false
 		else:
 			touches.erase(event.get_index())
@@ -69,28 +69,32 @@ func _unhandled_input(event):
 				
 	elif event is InputEventScreenDrag:
 		drags[event.index] = event
-		if !gesture_in_progress():
+		if !complex_gesture_in_progress():
 			if(drag_enabled):
 				emit("single_drag", [event.position,event.relative])
 			else:
 				if drag_startup_timer.is_stopped(): drag_startup_timer.start(DRAG_STARTUP_TIME)
-		if gesture_in_progress():
+		if complex_gesture_in_progress():
 				if is_pinch(drags):
 					emit("pinch",[gesture_center(drags),pinch_intensity(drags)])
 				else:
 					emit("multi_drag", [gesture_center(drags),gesture_displacement(drags)])
 
+# emits_signal sig with the specified args
 func emit(sig,args):
 	if debug: print(sig,": ", args)
 	args.push_front(sig)
 	callv("emit_signal",args)
-	
-func gesture_in_progress():
+
+# starts complex gesture (more than one finger) is in progress
+func start_complex_gesture():
+	only_touch = null
+
+# checks if complex gesture (more than one finger) is in progress
+func complex_gesture_in_progress():
 	return only_touch == null
 
-func start_gesture():
-	only_touch = null
-	
+# checks if the gesture is pinch 
 func is_pinch(drags):
 	var dvals = drags.values()
 	return (dvals[0].relative.normalized() + dvals[1].relative.normalized()).length() < 1
@@ -119,10 +123,8 @@ func gesture_displacement(events):
 	return (sum)/events.size()
 
 func on_touch_delay_timer_timeout():
-	if !gesture_in_progress():
+	if !complex_gesture_in_progress():
 		emit("single_touch", [only_touch.position])
 
 func on_drag_startup_timeout():
-	drag_enabled = !gesture_in_progress()
-
-	
+	drag_enabled = !complex_gesture_in_progress()
