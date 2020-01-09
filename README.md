@@ -1,5 +1,5 @@
 # Godot Touch Input Manager
- Script to handle touch input (including gestures). It also translates mouse input to touch input.
+ Script to handle touch input. It also translates mouse input to gestures.
 
 ## How to use
 * Dowload the InputManager.gd
