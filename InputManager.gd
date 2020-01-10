@@ -49,7 +49,7 @@ func _unhandled_input(event):
 			
 	elif event is InputEventMouseMotion:
 		if last_mb == BUTTON_MIDDLE:
-			emit("multi_drag", [event.relative])
+			emit("multi_drag", [null, event.relative])
 	
 	# Touch
 	elif event is InputEventScreenTouch:
