@@ -1,7 +1,7 @@
 extends Node
 
 #properties
-var debug = true
+var debug = false
 var android = false
 var DRAG_STARTUP_TIME = 0.01
 var TOUCH_DELAY_TIME = 0.2
@@ -49,7 +49,7 @@ func _unhandled_input(event):
 			
 	elif event is InputEventMouseMotion:
 		if last_mb == BUTTON_MIDDLE:
-			emit("multi_drag", [event.relative])
+			emit("multi_drag", [event.position, event.relative])
 	
 	# Touch
 	elif event is InputEventScreenTouch:
