@@ -14,14 +14,25 @@
 | Multiple finger drag      | multi_drag   | Vector2 position, Vector2 relative |
 
 
+## Mouse to gesture
+To enable single finger gestures go to **Project > Project Settings > Input Devices > Pointing** and turn on *Emulate Touch From Mouse* to emulate a single finger press with the left click. For the other gestures 
+
+| Gesture                   | Mouse action                                      |
+|---------------------------|---------------------------------------------------|
+| Pinch outward             | Scroll up                                         |
+| Pinch inward              | Scroll down                                       |
+| Multiple finger drag      | Middle click                                      |
+
 ## Versioning
 Using [SemVer](http://semver.org/) for versioning. For the versions available, see the [releases](https://github.com/Federico-Ciuffardi/IOSU/releases) 
 
 ## Authors
 * Federico Ciuffardi
+
 Feel free to append yourself here if you've made contributions.
 
 ## Note
 Thank you for checking out this repository, you can send all your questions and feedback to Federico.Ciuffardi@outlook.com.
 
 If you are up to contribute on some way please contact me :)
+
