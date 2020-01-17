@@ -2,19 +2,51 @@
  Script to handle touch input. It also translates mouse input to gestures.
 
 ## How to use
-* Dowload the InputManager.gd
-* Put it inside of a node (or use [Autoload](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/singletons_autoload.html)) and [connect](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/signals.html) the signals to the nodes that will use the gesture associated with said signal.
+* Dowload the latest release from https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager/releases
+* Extract the downloaded *.zip* file somewhere in you project
+* Locate the InputManager.gd, put it inside of a node (or use [Autoload](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/singletons_autoload.html)) and [connect](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/signals.html) the signals to the nodes that will use the gesture associated with said signal.
 
 For more information on how to do this see the [examples](https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager/tree/master/examples).
 
 ## Supported gestures and it's signals:
-| Name                      | Signal       | Args                               |
-|---------------------------|--------------|------------------------------------|
-| Single finger touch (tap) | single_touch | Vector2 position                   |
-| Single finger drag        | single_drag  | Vector2 position, Vector2 relative |
-| Pinch                     | pinch        | Vector2 position, float intensity  |
-| Multiple finger drag      | multi_drag   | Vector2 position, Vector2 relative |
+| Name                      | Signal       | Args                                                   |
+|---------------------------|--------------|--------------------------------------------------------|
+| Single finger tap         | singe_tap    |  [InputEventScreenTouch](https://docs.godotengine.org/en/3.1/classes/class_inputeventscreentouch.html)                      |
+| Single finger touch       | single_touch | [InputEventScreenTouch](https://docs.godotengine.org/en/3.1/classes/class_inputeventscreentouch.html)                      |
+| Single finger drag        | single_drag  | [InputEventScreenDrag](https://docs.godotengine.org/en/3.1/classes/class_inputeventscreendrag.html)                       |
+| Pinch                     | pinch        | [InputEventScreenPinch](#inputeventscreenpinch)        |
+| Multiple finger drag      | multi_drag   | [InputEventMultiScreenDrag](#inputeventmultiscreendrag)|
 
+## Custom Input Events
+The purpose of these is to provide a InputEvent for the inputs that are not considered by the built-in InputsEvents.
+
+### InputEventScreenPinch
+
+#### Properties
+
+* Vector2 **position**
+
+Pinch center position.
+
+* int **relative**
+
+Relative distance variation of the first two fingers of the pinch. 
+
+### InputEventMultiScreenDrag
+
+#### Properties
+
+* Vector2 **position**
+
+MultiScreenDrag position (Average position of all the Drags involved).
+
+* Vector2 **relative**
+
+MultiScreenDrag position relative to its start position (Average relative of all the Drags involved).
+
+* Vector2 **speed**
+
+MultiScreenDrag speed (Average speed of all the Drags involved).
 
 ## Mouse to gesture
 To enable single finger gestures go to **Project > Project Settings > Input Devices > Pointing** and turn on *Emulate Touch From Mouse* to emulate a single finger press with the left click. For the other gestures 
