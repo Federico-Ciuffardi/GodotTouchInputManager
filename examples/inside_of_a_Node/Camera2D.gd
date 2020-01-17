@@ -1,13 +1,28 @@
 extends Camera2D
 
-func _on_InputManager_multi_drag(pos,rel):
-	offset -= rel*zoom
+onready var deb = get_node("/root/World/Control/InfoDisp")
 
-func _on_InputManager_pinch(pos,i):
-	if zoom.x <= 0.16 and sign(i) < 0:
+# Public
+
+func to_global(position):
+	if anchor_mode == ANCHOR_MODE_FIXED_TOP_LEFT:
+		return offset + position*zoom
+	elif anchor_mode ==  ANCHOR_MODE_DRAG_CENTER:
+		return offset + (position + (get_viewport().get_visible_rect().size/2))*zoom
+
+# Private
+
+func _on_InputManager_multi_drag(event):
+	offset -= event.relative*zoom
+	
+func _on_InputManager_pinch(event):
+	var relative_scaled = event.relative/400.0
+	if zoom.x <= 0.16 and sign(relative_scaled) < 0:
 		pass
-	elif zoom.x >= 4 and sign(i) > 0:
+	elif zoom.x >= 4 and sign(relative_scaled) > 0:
 		pass
 	else:
-		offset += pos*(-i*zoom)
-		zoom += Vector2(i,i)*zoom
+		if anchor_mode == ANCHOR_MODE_FIXED_TOP_LEFT:
+			offset += event.position*(-relative_scaled*zoom)
+		zoom += Vector2(relative_scaled,relative_scaled)*zoom
+		

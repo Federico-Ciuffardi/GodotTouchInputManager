@@ -1,16 +1,21 @@
 extends Node
 
+# Custom InputEvents
+var InputEventMultiScreenDrag = preload("CustomInputEvents/InputEventMultiScreenDrag.gd")
+var InputEventScreenPinch = preload("CustomInputEvents/InputEventScreenPinch.gd")
+
 #properties
 var debug = false
 var android = false
-var DRAG_STARTUP_TIME = 0.01
+var DRAG_STARTUP_TIME = 0.02
 var TOUCH_DELAY_TIME = 0.2
 
 #signals
-signal single_touch #pos
-signal single_drag  #pos, relpos
-signal multi_drag   #relpos
-signal pinch        #pos, intensity
+signal single_tap
+signal single_touch
+signal single_drag
+signal multi_drag
+signal pinch
 
 #control
 var last_mb = 0  # last mouse button pressed
@@ -40,91 +45,89 @@ func _unhandled_input(event):
 	if event is InputEventMouseButton:
 		if event.pressed:
 			if(event.button_index == BUTTON_WHEEL_DOWN):
-				emit("pinch", [event.position,0.2])
+				emit("pinch",InputEventScreenPinch.new(event.position,40.0))
 			elif(event.button_index == BUTTON_WHEEL_UP):
-				emit("pinch",[event.position,-0.2])
+				emit("pinch",InputEventScreenPinch.new(event.position,-40.0))
 			last_mb = event.button_index
 		else:
 			last_mb = 0
 			
 	elif event is InputEventMouseMotion:
 		if last_mb == BUTTON_MIDDLE:
-			emit("multi_drag", [event.position, event.relative])
+			emit("multi_drag", InputEventMultiScreenDrag.new(event.position,event.relative,event.speed))
 	
-	# Touch
+	# touch
 	elif event is InputEventScreenTouch:
+		if (event.get_index() == 0): emit("single_touch", event)
 		if event.pressed:
 			touches[event.get_index()] = event 
 			if (event.get_index() == 0): # first and only touch
 				only_touch = event
 				if touch_delay_timer.is_stopped(): touch_delay_timer.start(TOUCH_DELAY_TIME)
 			else:
-				start_complex_gesture()
-				drag_enabled = false
+				only_touch = null
+				cancel_single_drag()
 		else:
 			touches.erase(event.get_index())
 			drags.erase(event.get_index())
-			if(touches.size()==0):
-				drag_enabled = false
+			cancel_single_drag()
+				
 				
 	elif event is InputEventScreenDrag:
 		drags[event.index] = event
+		only_touch = null
 		if !complex_gesture_in_progress():
 			if(drag_enabled):
-				emit("single_drag", [event.position,event.relative])
+				emit("single_drag", event)
 			else:
 				if drag_startup_timer.is_stopped(): drag_startup_timer.start(DRAG_STARTUP_TIME)
-		if complex_gesture_in_progress():
-				if is_pinch(drags):
-					emit("pinch",[gesture_center(drags),pinch_intensity(drags)])
-				else:
-					emit("multi_drag", [gesture_center(drags),gesture_displacement(drags)])
+		else:
+			cancel_single_drag()
+			if is_pinch(drags):
+				emit("pinch", InputEventScreenPinch.new(get_multi_touch_property(drags,"position"),
+														pinch_relative_distance(drags)))
+			else:
+				emit("multi_drag", InputEventMultiScreenDrag.new(get_multi_touch_property(drags,"position"),
+																 get_multi_touch_property(drags,"relative"),
+																 get_multi_touch_property(drags,"velocity")))
 
 # emits_signal sig with the specified args
-func emit(sig,args):
-	if debug: print(sig,": ", args)
-	args.push_front(sig)
-	callv("emit_signal",args)
+func emit(sig,val):
+	if debug: print(sig,": ", val)
+	emit_signal(sig,val)
 
-# starts complex gesture (more than one finger) is in progress
-func start_complex_gesture():
-	only_touch = null
-
+# disables drag and stops the drag enabling timer
+func cancel_single_drag():
+	drag_enabled = false
+	drag_startup_timer.stop()
+	
 # checks if complex gesture (more than one finger) is in progress
 func complex_gesture_in_progress():
-	return only_touch == null
+	return touches.size() > 1
 
 # checks if the gesture is pinch 
 func is_pinch(drags):
 	var dvals = drags.values()
 	return (dvals[0].relative.normalized() + dvals[1].relative.normalized()).length() < 1
 
-func pinch_intensity(events):
+func pinch_relative_distance(events):
 	var pos0_i = events[0].position
 	var pos0_f = pos0_i + events[0].relative
 	
 	var pos1_i = events[1].position
 	var pos1_f = pos1_i + events[1].relative
 	
-	var raw_pinch = pos0_i.distance_to(pos1_i) - pos0_f.distance_to(pos1_f)
-	
-	return (raw_pinch)/200
+	return pos0_i.distance_to(pos1_i) - pos0_f.distance_to(pos1_f)
 
-func gesture_center(events):
+func get_multi_touch_property(events,property):
 	var sum = Vector2()
 	for e in events.values():
-		sum += e.position
+		sum += e.get(property)
 	return sum/events.size()
 
-func gesture_displacement(events):
-	var sum = Vector2()
-	for e in events.values():
-		sum += e.relative
-	return (sum)/events.size()
-
 func on_touch_delay_timer_timeout():
-	if !complex_gesture_in_progress():
-		emit("single_touch", [only_touch.position])
+	if only_touch:
+		emit("single_tap", only_touch)
 
 func on_drag_startup_timeout():
-	drag_enabled = !complex_gesture_in_progress()
+	drag_enabled = !complex_gesture_in_progress() and drags.size() > 0

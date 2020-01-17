@@ -21,7 +21,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-InputManager="*res://InputManager.gd"
+InputManager="*res://Godot-Touch-Input-Manager/InputManager.gd"
 
 [rendering]
 
