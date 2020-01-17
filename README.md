@@ -24,11 +24,11 @@ The purpose of these is to provide a InputEvent for the inputs that are not cons
 
 #### Properties
 
-* Vector2 **position**
+* [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **position**
 
 Pinch center position.
 
-* int **relative**
+* [int](https://docs.godotengine.org/en/3.1/classes/class_int.html#class-int) **relative**
 
 Relative distance variation of the first two fingers of the pinch. 
 
@@ -36,15 +36,15 @@ Relative distance variation of the first two fingers of the pinch.
 
 #### Properties
 
-* Vector2 **position**
+* [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **position**
 
 MultiScreenDrag position (Average position of all the Drags involved).
 
-* Vector2 **relative**
+* [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **relative**
 
 MultiScreenDrag position relative to its start position (Average relative of all the Drags involved).
 
-* Vector2 **speed**
+* [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **speed**
 
 MultiScreenDrag speed (Average speed of all the Drags involved).
 
