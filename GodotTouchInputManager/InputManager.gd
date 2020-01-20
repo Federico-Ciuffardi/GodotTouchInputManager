@@ -16,6 +16,7 @@ signal single_touch
 signal single_drag
 signal multi_drag
 signal pinch
+signal any_gesture
 
 #control
 var last_mb = 0  # last mouse button pressed
@@ -58,16 +59,18 @@ func _unhandled_input(event):
 	
 	# touch
 	elif event is InputEventScreenTouch:
-		if (event.get_index() == 0): emit("single_touch", event)
 		if event.pressed:
 			touches[event.get_index()] = event 
 			if (event.get_index() == 0): # first and only touch
+				emit("single_touch", event)
 				only_touch = event
 				if touch_delay_timer.is_stopped(): touch_delay_timer.start(TOUCH_DELAY_TIME)
 			else:
 				only_touch = null
 				cancel_single_drag()
 		else:
+			if (event.get_index() == 0 and only_touch ):
+				emit("single_touch", event)
 			touches.erase(event.get_index())
 			drags.erase(event.get_index())
 			cancel_single_drag()
@@ -75,7 +78,6 @@ func _unhandled_input(event):
 				
 	elif event is InputEventScreenDrag:
 		drags[event.index] = event
-		only_touch = null
 		if !complex_gesture_in_progress():
 			if(drag_enabled):
 				emit("single_drag", event)
@@ -94,6 +96,7 @@ func _unhandled_input(event):
 # emits_signal sig with the specified args
 func emit(sig,val):
 	if debug: print(sig,": ", val)
+	emit_signal("any_gesture",sig,val)
 	emit_signal(sig,val)
 
 # disables drag and stops the drag enabling timer
