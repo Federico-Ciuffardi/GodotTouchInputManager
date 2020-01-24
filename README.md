@@ -16,6 +16,7 @@ For more information on how to do this see the [examples](https://github.com/Fed
 | Single finger drag        | single_drag  | [InputEventScreenDrag](https://docs.godotengine.org/en/3.1/classes/class_inputeventscreendrag.html)                       |
 | Pinch                     | pinch        | [InputEventScreenPinch](#inputeventscreenpinch)        |
 | Multiple finger drag      | multi_drag   | [InputEventMultiScreenDrag](#inputeventmultiscreendrag)|
+| any gesture               | any_gesture  | signal_name, InputEvent | 
 
 ## Custom Input Events
 The purpose of these is to provide a InputEvent for the inputs that are not considered by the built-in InputsEvents.
