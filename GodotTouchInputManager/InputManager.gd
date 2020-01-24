@@ -24,7 +24,7 @@ var touches = {} # keeps track of all the touches
 var drags = {}   # keeps track of all the drags
 
 var touch_delay_timer = Timer.new()
-var only_touch = null # last touch if it isn't part of a geture
+var only_touch = null # last touch if there wasn't another touch at the same time
 
 var drag_startup_timer = Timer.new()
 var drag_enabled = false 
@@ -45,17 +45,21 @@ func _unhandled_input(event):
 	# mouse to gesture
 	if event is InputEventMouseButton:
 		if event.pressed:
-			if(event.button_index == BUTTON_WHEEL_DOWN):
-				emit("pinch",InputEventScreenPinch.new(event.position,40.0))
-			elif(event.button_index == BUTTON_WHEEL_UP):
-				emit("pinch",InputEventScreenPinch.new(event.position,-40.0))
+			if event.button_index == BUTTON_WHEEL_DOWN:
+				emit("pinch",InputEventScreenPinch.new({"position":event.position,
+														"relative":40.0}))
+			elif event.button_index == BUTTON_WHEEL_UP:
+				emit("pinch",InputEventScreenPinch.new({"position":event.position,
+														"relative":-40.0}))
 			last_mb = event.button_index
 		else:
 			last_mb = 0
 			
 	elif event is InputEventMouseMotion:
 		if last_mb == BUTTON_MIDDLE:
-			emit("multi_drag", InputEventMultiScreenDrag.new(event.position,event.relative,event.speed))
+			emit("multi_drag", InputEventMultiScreenDrag.new({"position":event.position,
+															  "relative":event.relative,
+															  "speed":event.speed}))
 	
 	# touch
 	elif event is InputEventScreenTouch:
@@ -69,7 +73,7 @@ func _unhandled_input(event):
 				only_touch = null
 				cancel_single_drag()
 		else:
-			if (event.get_index() == 0 and only_touch ):
+			if event.get_index() == 0 and only_touch:
 				emit("single_touch", event)
 			touches.erase(event.get_index())
 			drags.erase(event.get_index())
@@ -86,12 +90,9 @@ func _unhandled_input(event):
 		else:
 			cancel_single_drag()
 			if is_pinch(drags):
-				emit("pinch", InputEventScreenPinch.new(get_multi_touch_property(drags,"position"),
-														pinch_relative_distance(drags)))
+				emit("pinch", InputEventScreenPinch.new(drags))
 			else:
-				emit("multi_drag", InputEventMultiScreenDrag.new(get_multi_touch_property(drags,"position"),
-																 get_multi_touch_property(drags,"relative"),
-																 get_multi_touch_property(drags,"velocity")))
+				emit("multi_drag", InputEventMultiScreenDrag.new(drags))
 
 # emits_signal sig with the specified args
 func emit(sig,val):
@@ -110,23 +111,10 @@ func complex_gesture_in_progress():
 
 # checks if the gesture is pinch 
 func is_pinch(drags):
-	var dvals = drags.values()
-	return (dvals[0].relative.normalized() + dvals[1].relative.normalized()).length() < 1
-
-func pinch_relative_distance(events):
-	var pos0_i = events[0].position
-	var pos0_f = pos0_i + events[0].relative
-	
-	var pos1_i = events[1].position
-	var pos1_f = pos1_i + events[1].relative
-	
-	return pos0_i.distance_to(pos1_i) - pos0_f.distance_to(pos1_f)
-
-func get_multi_touch_property(events,property):
 	var sum = Vector2()
-	for e in events.values():
-		sum += e.get(property)
-	return sum/events.size()
+	for e in drags.values():
+		sum += e.relative.normalized()
+	return sum.length() < 1
 
 func on_touch_delay_timer_timeout():
 	if only_touch:
