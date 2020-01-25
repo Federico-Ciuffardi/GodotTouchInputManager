@@ -2,25 +2,21 @@ extends Object
 
 var position
 var relative
-var distance 
 var speed
 
 func _init(dict):
 	if dict.has("position"):
 		position = dict["position"] 
 		relative = dict["relative"] 
-		distance = dict["distance"] 
 		speed    = dict["speed"] 
 	else:
 		position = get_events_property_avg(dict, "position")
 		speed    = get_events_property_avg_length(dict, "speed")
 		
-		distance = 0
 		relative = 0
 		for e in dict.values():
-			distance += (e.position - position).length()
-			relative += (e.position + e.relative - position).length()
-		relative -= distance
+			relative += (e.position - position).angle_to(e.position + e.relative - position)
+		relative /= dict.size() 
 
 # aux
 func get_events_property_avg(events,property):

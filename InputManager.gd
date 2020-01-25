@@ -1,25 +1,21 @@
 extends Node
 
-# Custom InputEvents
-var InputEventMultiScreenDrag = preload("CustomInputEvents/InputEventMultiScreenDrag.gd")
-var InputEventScreenPinch = preload("CustomInputEvents/InputEventScreenPinch.gd")
-
-#properties
+# Properties 
 var debug = false
-var android = false
 var DRAG_STARTUP_TIME = 0.02
 var TOUCH_DELAY_TIME = 0.2
 
-#signals
+# Signals
 signal single_tap
 signal single_touch
 signal single_drag
 signal multi_drag
 signal pinch
+signal twist
 signal any_gesture
 
-#control
-var last_mb = 0  # last mouse button pressed
+# Control
+var last_mouse_press = null  # last mouse button pressed
 var touches = {} # keeps track of all the touches
 var drags = {}   # keeps track of all the drags
 
@@ -28,6 +24,15 @@ var only_touch = null # last touch if there wasn't another touch at the same tim
 
 var drag_startup_timer = Timer.new()
 var drag_enabled = false 
+
+# Custom InputEvents
+var InputEventMultiScreenDrag = preload("CustomInputEvents/InputEventMultiScreenDrag.gd")
+var InputEventScreenPinch     = preload("CustomInputEvents/InputEventScreenPinch.gd")
+var InputEventScreenTwist     = preload("CustomInputEvents/InputEventScreenTwist.gd")
+
+# Enum
+enum {PINCH,MULTI_DRAG,TWIST}
+
 
 ## creates the required timers and connects their timeouts
 func _ready():
@@ -47,19 +52,30 @@ func _unhandled_input(event):
 		if event.pressed:
 			if event.button_index == BUTTON_WHEEL_DOWN:
 				emit("pinch",InputEventScreenPinch.new({"position":event.position,
-														"relative":40.0}))
+														"distance":200.0,
+														"relative":-40.0,
+														"speed"   :25.0}))
 			elif event.button_index == BUTTON_WHEEL_UP:
 				emit("pinch",InputEventScreenPinch.new({"position":event.position,
-														"relative":-40.0}))
-			last_mb = event.button_index
+														"distance":200.0,
+														"relative":40.0,
+														"speed"   :25.0}))
+			last_mouse_press = event
 		else:
-			last_mb = 0
+			last_mouse_press = null
 			
 	elif event is InputEventMouseMotion:
-		if last_mb == BUTTON_MIDDLE:
-			emit("multi_drag", InputEventMultiScreenDrag.new({"position":event.position,
-															  "relative":event.relative,
-															  "speed":event.speed}))
+		if last_mouse_press:
+			if last_mouse_press.button_index == BUTTON_MIDDLE:
+				emit("multi_drag", InputEventMultiScreenDrag.new({"position":event.position,
+																  "relative":event.relative,
+																  "speed":event.speed}))
+			elif last_mouse_press.button_index == BUTTON_RIGHT:
+				var rel1 = event.position - last_mouse_press.position
+				var rel2 = rel1 + event.relative
+				emit("twist", InputEventMultiScreenDrag.new({"position":last_mouse_press.position,
+															 "relative":rel1.angle_to(rel2),
+															 "speed":event.speed}))
 	
 	# touch
 	elif event is InputEventScreenTouch:
@@ -89,10 +105,13 @@ func _unhandled_input(event):
 				if drag_startup_timer.is_stopped(): drag_startup_timer.start(DRAG_STARTUP_TIME)
 		else:
 			cancel_single_drag()
-			if is_pinch(drags):
+			var gesture = identify_gesture(drags)
+			if gesture == PINCH:
 				emit("pinch", InputEventScreenPinch.new(drags))
-			else:
+			elif gesture == MULTI_DRAG:
 				emit("multi_drag", InputEventMultiScreenDrag.new(drags))
+			elif gesture == TWIST:
+				emit("twist",InputEventScreenTwist.new(drags))
 
 # emits_signal sig with the specified args
 func emit(sig,val):
@@ -110,11 +129,26 @@ func complex_gesture_in_progress():
 	return touches.size() > 1
 
 # checks if the gesture is pinch 
-func is_pinch(drags):
-	var sum = Vector2()
+func identify_gesture(drags):
+	var center = Vector2()
 	for e in drags.values():
-		sum += e.relative.normalized()
-	return sum.length() < 1
+		center += e.position
+	center /= drags.size()
+	
+	var sector = null
+	for e in drags.values():
+		var adjusted_position = center - e.position
+		var raw_angle = fmod(adjusted_position.angle_to(e.relative) + (PI/4), TAU) 
+		var adjusted_angle = raw_angle if raw_angle >= 0 else raw_angle + TAU
+		var e_sector = floor(adjusted_angle / (PI/2))
+		if sector == null: 
+			sector = e_sector
+		elif sector != e_sector:
+			sector = -1
+			
+	if sector == -1  :             return MULTI_DRAG
+	if sector == 0 or sector == 2: return PINCH
+	if sector == 1 or sector == 3: return TWIST
 
 func on_touch_delay_timer_timeout():
 	if only_touch:
@@ -122,3 +156,4 @@ func on_touch_delay_timer_timeout():
 
 func on_drag_startup_timeout():
 	drag_enabled = !complex_gesture_in_progress() and drags.size() > 0
+	
