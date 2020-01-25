@@ -16,7 +16,8 @@ For more information on how to do this see the [examples](https://github.com/Fed
 | Single finger drag        | single_drag  | [InputEventScreenDrag](https://docs.godotengine.org/en/3.1/classes/class_inputeventscreendrag.html)                       |
 | Pinch                     | pinch        | [InputEventScreenPinch](#inputeventscreenpinch)        |
 | Multiple finger drag      | multi_drag   | [InputEventMultiScreenDrag](#inputeventmultiscreendrag)|
-| any gesture               | any_gesture  | signal_name, InputEvent | 
+| Twist                     | twist        | [InputEventScreenTwist](#inputeventscreentwist)        |
+| any gesture               | any_gesture  | signal_name, InputEvent                                | 
 
 ## Custom Input Events
 The purpose of these is to provide a InputEvent for the inputs that are not considered by the built-in InputsEvents.
@@ -29,9 +30,14 @@ The purpose of these is to provide a InputEvent for the inputs that are not cons
 
 Pinch center position.
 
-* [int](https://docs.godotengine.org/en/3.1/classes/class_int.html#class-int) **relative**
+* [float](https://docs.godotengine.org/en/3.1/classes/class_float.html) **relative**
 
-Relative distance variation of the first two fingers of the pinch. 
+Relative distance variation of the pinch. 
+
+* [float](https://docs.godotengine.org/en/3.1/classes/class_float.html) **speed**
+
+Pinch speed (Average speed length of all the Drags involved).
+
 
 ### InputEventMultiScreenDrag
 
@@ -48,6 +54,22 @@ MultiScreenDrag position relative to its start position (Average relative of all
 * [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **speed**
 
 MultiScreenDrag speed (Average speed of all the Drags involved).
+
+### InputEventScreenTwist
+
+#### Properties
+
+* [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **position**
+
+Twist center position.
+
+* [float](https://docs.godotengine.org/en/3.1/classes/class_float.html) **relative**
+
+Twist relative angle.
+
+* [float](https://docs.godotengine.org/en/3.1/classes/class_float.html) **speed**
+
+Twist speed (Average speed length of all the Drags involved).
 
 ## Mouse to gesture
 To enable single finger gestures go to **Project > Project Settings > Input Devices > Pointing** and turn on *Emulate Touch From Mouse* to emulate a single finger press with the left click. For the other gestures 
