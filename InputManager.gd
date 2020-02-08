@@ -19,7 +19,7 @@ var last_mouse_press = null  # last mouse button pressed
 var touches = {} # keeps track of all the touches
 var drags = {}   # keeps track of all the drags
 
-var touch_delay_timer = Timer.new()
+var tap_delay_timer = Timer.new()
 var only_touch = null # last touch if there wasn't another touch at the same time
 
 var drag_startup_timer = Timer.new()
@@ -36,7 +36,7 @@ enum {PINCH,MULTI_DRAG,TWIST}
 
 ## creates the required timers and connects their timeouts
 func _ready():
-	add_timer(touch_delay_timer,"on_touch_delay_timer_timeout")
+	add_timer(tap_delay_timer,"on_tap_delay_timer_timeout")
 	add_timer(drag_startup_timer,"on_drag_startup_timeout")
 
 # macro to add a timer and connect it's timeout to func_name
@@ -84,7 +84,7 @@ func _unhandled_input(event):
 			if (event.get_index() == 0): # first and only touch
 				emit("single_touch", event)
 				only_touch = event
-				if touch_delay_timer.is_stopped(): touch_delay_timer.start(TOUCH_DELAY_TIME)
+				if tap_delay_timer.is_stopped(): tap_delay_timer.start(TOUCH_DELAY_TIME)
 			else:
 				only_touch = null
 				cancel_single_drag()
@@ -150,8 +150,8 @@ func identify_gesture(drags):
 	if sector == 0 or sector == 2: return PINCH
 	if sector == 1 or sector == 3: return TWIST
 
-func on_touch_delay_timer_timeout():
-	if only_touch:
+func on_tap_delay_timer_timeout():
+	if only_touch and touches.size() == 0:
 		emit("single_tap", only_touch)
 
 func on_drag_startup_timeout():
