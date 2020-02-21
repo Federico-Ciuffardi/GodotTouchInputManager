@@ -6,8 +6,7 @@
 * Extract the downloaded *.zip* file somewhere in you project
 * Locate the InputManager.gd, put it inside of a node (or use [Autoload](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/singletons_autoload.html)) and [connect](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/signals.html) the signals to the nodes that will use the gesture associated with said signal.
 
-For more information on how to do this see the [examples](https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager-Examples).
-
+See [GestureControlledCamera2D](https://github.com/Federico-Ciuffardi/GestureControlledCamera2D) for an example!
 ## Supported gestures and it's signals:
 | Name                      | Signal       | Args                                                   |
 |---------------------------|--------------|--------------------------------------------------------|
