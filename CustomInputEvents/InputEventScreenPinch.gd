@@ -19,7 +19,7 @@ func _init(dict):
 		relative = 0
 		for e in dict.values():
 			distance += (e.position - position).length()
-			relative += (e.position + e.relative - position).length()
+			relative += (e.position + (e.relative/dict.size()) - position).length()
 		relative -= distance
 
 # aux

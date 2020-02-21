@@ -15,7 +15,7 @@ func _init(dict):
 
 		relative = 0
 		for e in dict.values():
-			relative += (e.position - position).angle_to(e.position + e.relative - position)/1.8
+			relative += (e.position - position).angle_to(e.position + (e.relative/dict.size()) - position)
 		relative = (relative/dict.size())
 
 # aux

@@ -11,7 +11,7 @@ func _init(dict):
 		self.speed    = dict["speed"] 
 	else:
 		self.position = get_events_property_avg(dict,"position")
-		self.relative = get_events_property_avg(dict,"relative")
+		self.relative = get_events_property_avg(dict,"relative")/dict.size()
 		self.speed    = get_events_property_avg(dict,"speed")
 	
 # aux
