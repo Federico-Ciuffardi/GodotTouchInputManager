@@ -1,3 +1,5 @@
+<img src="https://i.imgur.com/HxwBAK2.png" align="right" />
+
 # Godot Touch Input Manager
  Script to handle touch input. It also translates mouse input to gestures.
 
