@@ -12,11 +12,11 @@ func _init(dict):
 	else:
 		position = get_events_property_avg(dict, "position")
 		speed    = get_events_property_avg_length(dict, "speed")
-		
+
 		relative = 0
 		for e in dict.values():
-			relative += (e.position - position).angle_to(e.position + e.relative - position)
-		relative /= dict.size() 
+			relative += (e.position - position).angle_to(e.position + e.relative - position)/1.8
+		relative = (relative/dict.size())
 
 # aux
 func get_events_property_avg(events,property):
