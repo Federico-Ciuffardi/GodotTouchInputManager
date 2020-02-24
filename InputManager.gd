@@ -77,7 +77,7 @@ func _unhandled_input(event):
 		if event.pressed:
 			touches[event.get_index()] = event 
 			if (event.get_index() == 0): # first and only touch
-				emit("single_touch", event)
+				emit("single_touch", InputEventSingleScreenTouch.new(event))
 				only_touch = event
 				if tap_delay_timer.is_stopped(): tap_delay_timer.start(TOUCH_DELAY_TIME)
 			else:
@@ -85,7 +85,7 @@ func _unhandled_input(event):
 				cancel_single_drag()
 		else:
 			if event.get_index() == 0 and only_touch:
-				emit("single_touch", event)
+				emit("single_touch", InputEventSingleScreenTouch.new(event))
 			touches.erase(event.get_index())
 			drags.erase(event.get_index())
 			cancel_single_drag()
@@ -95,7 +95,7 @@ func _unhandled_input(event):
 		drags[event.index] = event
 		if !complex_gesture_in_progress():
 			if(drag_enabled):
-				emit("single_drag", event)
+				emit("single_drag", InputEventSingleScreenDrag.new(event))
 			else:
 				if drag_startup_timer.is_stopped(): drag_startup_timer.start(DRAG_STARTUP_TIME)
 		else:
@@ -113,8 +113,7 @@ func emit(sig,val):
 	if debug: print(sig,": ", val)
 	emit_signal("any_gesture",sig,val)
 	emit_signal(sig,val)
-	if val is InputEventAction:
-		Input.parse_input_event(val)
+	Input.parse_input_event(val)
 
 # disables drag and stops the drag enabling timer
 func cancel_single_drag():
@@ -149,7 +148,7 @@ func identify_gesture(drags):
 
 func on_tap_delay_timer_timeout():
 	if only_touch and touches.size() == 0:
-		emit("single_tap", only_touch)
+		emit("single_tap", InputEventSingleScreenTap.new(only_touch))
 
 func on_drag_startup_timeout():
 	drag_enabled = !complex_gesture_in_progress() and drags.size() > 0
