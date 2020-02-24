@@ -11,18 +11,21 @@
 
 See [GestureControlledCamera2D](https://github.com/Federico-Ciuffardi/GestureControlledCamera2D) for an example!
 ## Supported gestures and it's signals
-| Name                      | Signal       | Args                                                   |
-|---------------------------|--------------|--------------------------------------------------------|
-| Single finger tap         | singe_tap    |  [InputEventScreenTouch](https://docs.godotengine.org/en/3.1/classes/class_inputeventscreentouch.html)                      |
-| Single finger touch       | single_touch | [InputEventScreenTouch](https://docs.godotengine.org/en/3.1/classes/class_inputeventscreentouch.html)                      |
-| Single finger drag        | single_drag  | [InputEventScreenDrag](https://docs.godotengine.org/en/3.1/classes/class_inputeventscreendrag.html)                       |
+| Name                      | Signal       | Args                                                       |
+|---------------------------|--------------|------------------------------------------------------------|
+| Single finger tap         | singe_tap    |  [InputEventSingleScreenTap](#inputeventsinglescreentap)   |
+| Single finger touch       | single_touch | [InputEventSingleScreenTouch](#inputeventsinglescreentouch)|
+| Single finger drag        | single_drag  | [InputEventSingleScreenDrag](#inputeventsinglescreendrag)                       |
 | Pinch                     | pinch        | [InputEventScreenPinch](#inputeventscreenpinch)        |
 | Multiple finger drag      | multi_drag   | [InputEventMultiScreenDrag](#inputeventmultiscreendrag)|
 | Twist                     | twist        | [InputEventScreenTwist](#inputeventscreentwist)        |
 | any gesture               | any_gesture  | signal_name, InputEvent                                | 
 
 ## Custom Input Events
-The purpose of these is to provide a InputEvent for the inputs that are not considered by the built-in InputsEvents. When a gesture is detected [`_input(InputEvent event)`](https://docs.godotengine.org/en/3.1/classes/class_node.html#class-node-method-input) will be called with the input event associated to the detected gesture as the `event` parameter.
+The purpose of these is to provide a InputEvent for the inputs that are not considered by the built-in InputsEvents.
+
+When a gesture is detected [`_input(InputEvent event)`](https://docs.godotengine.org/en/3.1/classes/class_node.html#class-node-method-input) will be called with the input event associated to the detected gesture as the `event` parameter.
+
 
 ### InputEventScreenPinch
 
@@ -40,6 +43,21 @@ Relative distance variation of the pinch.
 
 Pinch speed (Average speed length of all the Drags involved).
 
+### InputEventSingleScreenDrag
+
+#### Properties
+
+* [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **position**
+
+SingleScreenDrag position.
+
+* [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **relative**
+
+SingleScreenDrag position relative to its previous position.
+
+* [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **speed**
+
+SingleScreenDrag speed.
 
 ### InputEventMultiScreenDrag
 
@@ -51,7 +69,7 @@ MultiScreenDrag position (Average position of all the Drags involved).
 
 * [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **relative**
 
-MultiScreenDrag position relative to its start position (Average relative of all the Drags involved).
+MultiScreenDrag position relative to its previous position (Average relative of all the Drags involved).
 
 * [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **speed**
 
@@ -72,6 +90,28 @@ Twist relative angle.
 * [float](https://docs.godotengine.org/en/3.1/classes/class_float.html) **speed**
 
 Twist speed (Average speed length of all the Drags involved).
+
+### InputEventSingleScreenTap
+
+#### Properties
+
+* [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **position**
+
+Tap position.
+
+### InputEventSingleScreenTouch
+
+#### Properties
+
+* [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) **position**
+
+SingleScreenTouch position.
+
+* [boolean](https://docs.godotengine.org/en/3.0/classes/class_bool.html) **pressed**
+
+ If `true` the touch is starting. If `false` the touch is ending.
+
+
 
 ## Mouse to gesture
 To enable single finger gestures go to **Project > Project Settings > Input Devices > Pointing** and turn on *Emulate Touch From Mouse* to emulate a single finger press with the left click. For the other gestures 
