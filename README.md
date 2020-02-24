@@ -6,10 +6,11 @@
 ## How to use
 * Dowload the latest release from https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager/releases
 * Extract the downloaded *.zip* file somewhere in you project
-* Locate the InputManager.gd, put it inside of a node (or use [Autoload](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/singletons_autoload.html)) and [connect](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/signals.html) the signals to the nodes that will use the gesture associated with said signal.
+* Locate the extracted `InputManager.gd`, and [Autoload](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/singletons_autoload.html) it.
+* Done! Now you can use the GodotTouchInputManager's [signals](supported-gestures-and-it's-signals) and it's [Custom Input Events](custom-input-events).
 
 See [GestureControlledCamera2D](https://github.com/Federico-Ciuffardi/GestureControlledCamera2D) for an example!
-## Supported gestures and it's signals:
+## Supported gestures and it's signals
 | Name                      | Signal       | Args                                                   |
 |---------------------------|--------------|--------------------------------------------------------|
 | Single finger tap         | singe_tap    |  [InputEventScreenTouch](https://docs.godotengine.org/en/3.1/classes/class_inputeventscreentouch.html)                      |
@@ -21,7 +22,7 @@ See [GestureControlledCamera2D](https://github.com/Federico-Ciuffardi/GestureCon
 | any gesture               | any_gesture  | signal_name, InputEvent                                | 
 
 ## Custom Input Events
-The purpose of these is to provide a InputEvent for the inputs that are not considered by the built-in InputsEvents.
+The purpose of these is to provide a InputEvent for the inputs that are not considered by the built-in InputsEvents. When a gesture is detected [`_input(InputEvent event)`](https://docs.godotengine.org/en/3.1/classes/class_node.html#class-node-method-input) will be called with the input event associated to the detected gesture as the `event` parameter.
 
 ### InputEventScreenPinch
 
