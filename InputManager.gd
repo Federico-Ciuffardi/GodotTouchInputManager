@@ -25,11 +25,6 @@ var only_touch = null # last touch if there wasn't another touch at the same tim
 var drag_startup_timer = Timer.new()
 var drag_enabled = false 
 
-# Custom InputEvents
-var InputEventMultiScreenDrag = preload("CustomInputEvents/InputEventMultiScreenDrag.gd")
-var InputEventScreenPinch     = preload("CustomInputEvents/InputEventScreenPinch.gd")
-var InputEventScreenTwist     = preload("CustomInputEvents/InputEventScreenTwist.gd")
-
 # Enum
 enum {PINCH,MULTI_DRAG,TWIST}
 
@@ -73,7 +68,7 @@ func _unhandled_input(event):
 			elif last_mouse_press.button_index == BUTTON_RIGHT:
 				var rel1 = event.position - last_mouse_press.position
 				var rel2 = rel1 + event.relative
-				emit("twist", InputEventMultiScreenDrag.new({"position":last_mouse_press.position,
+				emit("twist", InputEventScreenTwist.new({"position":last_mouse_press.position,
 															 "relative":rel1.angle_to(rel2),
 															 "speed":event.speed}))
 	
@@ -118,6 +113,8 @@ func emit(sig,val):
 	if debug: print(sig,": ", val)
 	emit_signal("any_gesture",sig,val)
 	emit_signal(sig,val)
+	if val is InputEventAction:
+		Input.parse_input_event(val)
 
 # disables drag and stops the drag enabling timer
 func cancel_single_drag():

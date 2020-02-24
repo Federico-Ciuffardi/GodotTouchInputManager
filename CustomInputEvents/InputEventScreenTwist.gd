@@ -1,4 +1,5 @@
-extends Object
+class_name InputEventScreenTwist
+extends InputEventAction
 
 var position
 var relative
