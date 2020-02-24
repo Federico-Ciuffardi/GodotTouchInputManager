@@ -7,7 +7,7 @@
 * Dowload the latest release from https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager/releases
 * Extract the downloaded *.zip* file somewhere in you project
 * Locate the extracted `InputManager.gd`, and [Autoload](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/singletons_autoload.html) it.
-* Done! Now you can use the GodotTouchInputManager's [signals](supported-gestures-and-it's-signals) and it's [Custom Input Events](custom-input-events).
+* Done! Now you can use the GodotTouchInputManager's [signals](#supported-gestures-and-it's-signals) and it's [Custom Input Events](#custom-input-events).
 
 See [GestureControlledCamera2D](https://github.com/Federico-Ciuffardi/GestureControlledCamera2D) for an example!
 ## Supported gestures and it's signals
