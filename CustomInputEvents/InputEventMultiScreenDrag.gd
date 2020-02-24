@@ -15,6 +15,9 @@ func _init(dict):
 		self.relative = get_events_property_avg(dict,"relative")/dict.size()
 		self.speed    = get_events_property_avg(dict,"speed")
 	
+func as_text():
+	return "InputEventMultiScreenDrag : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed)
+
 # aux
 func get_events_property_avg(events,property):
 	var sum = Vector2()

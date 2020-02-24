@@ -19,6 +19,9 @@ func _init(dict):
 			relative += (e.position - position).angle_to(e.position + (e.relative/dict.size()) - position)
 		relative = (relative/dict.size())
 
+func as_text():
+	return "InputEventScreenTwist : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed)
+
 # aux
 func get_events_property_avg(events,property):
 	var sum = Vector2()

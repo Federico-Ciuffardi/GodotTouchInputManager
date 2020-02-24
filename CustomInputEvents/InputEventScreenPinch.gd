@@ -23,6 +23,9 @@ func _init(dict):
 			relative += (e.position + (e.relative/dict.size()) - position).length()
 		relative -= distance
 
+func as_text():
+	return "InputEventScreenPinch : position=" + str(position) + ", relative=" + str(relative) +", distance ="+str(distance) +", speed=" + str(speed)
+
 # aux
 func get_events_property_avg(events,property):
 	var sum = Vector2()
