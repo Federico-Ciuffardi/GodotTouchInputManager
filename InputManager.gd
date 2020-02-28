@@ -110,7 +110,7 @@ func _unhandled_input(event):
 
 # emits_signal sig with the specified args
 func emit(sig,val):
-	if debug: print(sig,": ", val)
+	if debug: print(val.as_text())
 	emit_signal("any_gesture",sig,val)
 	emit_signal(sig,val)
 	Input.parse_input_event(val)
