@@ -10,5 +10,6 @@ func _init(e):
 	relative = e.relative
 	speed = e.speed
 
+
 func as_text():
 	return "InputEventSingleScreenDrag : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed)
