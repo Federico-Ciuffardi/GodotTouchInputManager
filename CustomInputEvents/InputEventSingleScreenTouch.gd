@@ -8,4 +8,4 @@ func _init(e):
 	pressed = e.pressed
 
 func as_text():
-	return "InputEventSingleScreenDrag : position=" + str(position) + ", pressed=" + str(pressed)
+	return "InputEventSingleScreenTouch : position=" + str(position) + ", pressed=" + str(pressed)
