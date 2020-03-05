@@ -1,7 +1,7 @@
 <img src="https://i.imgur.com/HxwBAK2.png" align="right" />
 
 # Godot Touch Input Manager
-Godot Touch Input Manager is a script to handle touch input. You just need to autoload the script and it will start analyzing the touch input and when a gesture is detected a Custom Input Event corresponding to the detected gesture will be created and fed up to the Godot built in Input Event system so  it triggers functions like _input(InputEvent event).  There is also a signal for each gesture if you prefer using signals to the aforementioned. 
+Godot Touch Input Manager is a script to handle touch input. You just need to autoload the script and it will start analyzing the touch input and when a gesture is detected a Custom Input Event corresponding to the detected gesture will be created and fed up to the Godot built in Input Event system so  it triggers functions like [`_input(InputEvent event)`](https://docs.godotengine.org/en/3.1/classes/class_node.html#class-node-method-input).  There is also a signal for each gesture if you prefer using signals to the aforementioned. 
 
 ## How to use
 * Dowload the latest release from https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager/releases
