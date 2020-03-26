@@ -22,7 +22,7 @@ This asset was ported to be added to Godot and is now a milestone to version 4.0
 ### Supported gestures and it's signals
 | Name                      | Signal       | Args                                                       |
 |---------------------------|--------------|------------------------------------------------------------|
-| Single finger tap         | singe_tap    |  [InputEventSingleScreenTap](#inputeventsinglescreentap)   |
+| Single finger tap         | single_tap    |  [InputEventSingleScreenTap](#inputeventsinglescreentap)   |
 | Single finger touch       | single_touch | [InputEventSingleScreenTouch](#inputeventsinglescreentouch)|
 | Single finger drag        | single_drag  | [InputEventSingleScreenDrag](#inputeventsinglescreendrag)                       |
 | Pinch                     | pinch        | [InputEventScreenPinch](#inputeventscreenpinch)        |
