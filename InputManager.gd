@@ -99,13 +99,14 @@ func _unhandled_input(event):
 				if drag_startup_timer.is_stopped(): drag_startup_timer.start(DRAG_STARTUP_TIME)
 		else:
 			cancel_single_drag()
-			var gesture = identify_gesture(drags)
-			if gesture == Gestures.PINCH:
-				emit("pinch", InputEventScreenPinch.new(drags))
-			elif gesture == Gestures.MULTI_DRAG:
-				emit("multi_drag", InputEventMultiScreenDrag.new(drags))
-			elif gesture == Gestures.TWIST:
-				emit("twist",InputEventScreenTwist.new(drags))
+			if drags.size() > 1 :
+				var gesture = identify_gesture(drags)
+				if gesture == Gestures.PINCH:
+					emit("pinch", InputEventScreenPinch.new(drags))
+				elif gesture == Gestures.MULTI_DRAG:
+					emit("multi_drag", InputEventMultiScreenDrag.new(drags))
+				elif gesture == Gestures.TWIST:
+					emit("twist",InputEventScreenTwist.new(drags))
 
 
 # Emits signal sig with the specified args.
