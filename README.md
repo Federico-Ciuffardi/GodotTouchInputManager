@@ -44,6 +44,10 @@ When a gesture is detected [`_input(InputEvent event)`](https://docs.godotengine
 
 Pinch center position.
 
+* [float](https://docs.godotengine.org/en/3.1/classes/class_float.html) **distance**
+
+Distance of the pinch.
+
 * [float](https://docs.godotengine.org/en/3.1/classes/class_float.html) **relative**
 
 Relative distance variation of the pinch. 
