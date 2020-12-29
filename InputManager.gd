@@ -16,7 +16,7 @@ enum Gestures {PINCH, MULTI_DRAG, TWIST}
 # Constants.
 const debug = false
 const DRAG_STARTUP_TIME = 0.02
-const TOUCH_DELAY_TIME = 0.2
+const TAP_TIME_THRESHOLD = 0.2
 
 # Control.
 var last_mouse_press = null  # Last mouse button pressed.
@@ -79,7 +79,7 @@ func _unhandled_input(event):
 			if (event.get_index() == 0): # First and only touch.
 				emit("single_touch", InputEventSingleScreenTouch.new(event))
 				only_touch = event
-				if tap_delay_timer.is_stopped(): tap_delay_timer.start(TOUCH_DELAY_TIME)
+				if tap_delay_timer.is_stopped(): tap_delay_timer.start(TAP_TIME_THRESHOLD)
 			else:
 				only_touch = null
 				cancel_single_drag()
