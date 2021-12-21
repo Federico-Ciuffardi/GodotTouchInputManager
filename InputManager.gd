@@ -70,7 +70,7 @@ func _unhandled_input(event):
 				var rel1 = event.position - last_mouse_press.position
 				var rel2 = rel1 + event.relative
 				emit("twist", InputEventScreenTwist.new({"position": last_mouse_press.position,
-													     "relative": rel1.angle_to(rel2),
+														 "relative": rel1.angle_to(rel2),
 														 "speed": event.speed}))
 	
 	# Touch.
@@ -82,18 +82,18 @@ func _unhandled_input(event):
 				only_touch = event
 				if tap_delay_timer.is_stopped(): tap_delay_timer.start(TAP_TIME_THRESHOLD)
 			else:
-				only_touch = null
 				cancel_single_drag()
 				emit("multi_touch", InputEventMultiScreenTouch.new(event))
 		else:
 			touches.erase(event.get_index())
 			drags.erase(event.get_index())
 			cancel_single_drag()
-			if only_touch:
+			if (only_touch and (event.get_index() == 0)):
 				emit("single_touch", InputEventSingleScreenTouch.new(event))
 				if !tap_delay_timer.is_stopped(): 
 					tap_delay_timer.stop()
 					emit("single_tap", InputEventSingleScreenTap.new(only_touch))
+				only_touch = null
 			else :
 				emit("multi_touch", InputEventMultiScreenTouch.new(event))
 		
