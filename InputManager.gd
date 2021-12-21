@@ -4,6 +4,7 @@ extends Node
 # warning-ignore-all:unused_signal
 signal single_tap
 signal single_touch
+signal multi_touch
 signal single_drag
 signal multi_drag
 signal pinch
@@ -83,6 +84,7 @@ func _unhandled_input(event):
 			else:
 				only_touch = null
 				cancel_single_drag()
+				emit("multi_touch", InputEventMultiScreenTouch.new(event))
 		else:
 			touches.erase(event.get_index())
 			drags.erase(event.get_index())
@@ -92,6 +94,8 @@ func _unhandled_input(event):
 				if !tap_delay_timer.is_stopped(): 
 					tap_delay_timer.stop()
 					emit("single_tap", InputEventSingleScreenTap.new(only_touch))
+			else :
+				emit("multi_touch", InputEventMultiScreenTouch.new(event))
 		
 	elif event is InputEventScreenDrag:
 		drags[event.index] = event
