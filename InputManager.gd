@@ -24,7 +24,8 @@ var touches = {} # Keeps track of all the touches.
 var drags = {}   # Keeps track of all the drags.
 
 var tap_delay_timer = Timer.new()
-var only_touch = null # Last touch if there wasn't another touch at the same time.
+var only_touch = null # single touch in progress
+var single_touch_cancelled = false
 
 var drag_startup_timer = Timer.new()
 var drag_enabled = false 
@@ -69,7 +70,7 @@ func _unhandled_input(event):
 				var rel1 = event.position - last_mouse_press.position
 				var rel2 = rel1 + event.relative
 				emit("twist", InputEventScreenTwist.new({"position": last_mouse_press.position,
-													     "relative": rel1.angle_to(rel2),
+														 "relative": rel1.angle_to(rel2),
 														 "speed": event.speed}))
 	
 	# Touch.
@@ -77,21 +78,25 @@ func _unhandled_input(event):
 		if event.pressed:
 			touches[event.get_index()] = event 
 			if (event.get_index() == 0): # First and only touch.
-				emit("single_touch", InputEventSingleScreenTouch.new(event))
+				single_touch_cancelled = false
+				emit("single_touch", InputEventSingleScreenTouch.new(event, false))
 				only_touch = event
-				if tap_delay_timer.is_stopped(): tap_delay_timer.start(TAP_TIME_THRESHOLD)
+				if tap_delay_timer.is_stopped(): 
+					tap_delay_timer.start(TAP_TIME_THRESHOLD)
 			else:
-				only_touch = null
+				single_touch_cancelled = true
 				cancel_single_drag()
+				emit("single_touch", InputEventSingleScreenTouch.new(only_touch, true))
 		else:
 			touches.erase(event.get_index())
 			drags.erase(event.get_index())
 			cancel_single_drag()
-			if only_touch:
-				emit("single_touch", InputEventSingleScreenTouch.new(event))
+			if (only_touch and (event.get_index() == 0)):
+				emit("single_touch", InputEventSingleScreenTouch.new(event, single_touch_cancelled))
 				if !tap_delay_timer.is_stopped(): 
 					tap_delay_timer.stop()
 					emit("single_tap", InputEventSingleScreenTap.new(only_touch))
+				only_touch = null
 		
 	elif event is InputEventScreenDrag:
 		drags[event.index] = event
@@ -99,7 +104,8 @@ func _unhandled_input(event):
 			if(drag_enabled):
 				emit("single_drag", InputEventSingleScreenDrag.new(event))
 			else:
-				if drag_startup_timer.is_stopped(): drag_startup_timer.start(DRAG_STARTUP_TIME)
+				if drag_startup_timer.is_stopped(): 
+					drag_startup_timer.start(DRAG_STARTUP_TIME)
 		else:
 			cancel_single_drag()
 			if drags.size() > 1 :
