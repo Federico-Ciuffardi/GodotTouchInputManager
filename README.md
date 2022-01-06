@@ -1,14 +1,14 @@
 <img src="https://i.imgur.com/HxwBAK2.png" align="right" />
 
 # Godot Touch Input Manager
-Godot Touch Input Manager (GDTIM) is a script that improves touch input support (includes [new gestures](#supported-gestures)) in the Godot game engine. You just need to autoload the script and it will start analyzing the touch input and when a gesture is detected a Custom Input Event corresponding to the detected gesture will be created and fed up to the Godot built in Input Event system so  it triggers functions like [`_input(InputEvent event)`](https://docs.godotengine.org/en/3.1/classes/class_node.html#class-node-method-input). There is also a signal for each gesture if you prefer using signals to the aforementioned. 
+Godot Touch Input Manager (GDTIM) is a script that improves touch input support (includes [new gestures](#supported-gestures)) in the Godot game engine. You just need to autoload the script and it will start analyzing the touch input and when a gesture is detected a Custom Input Event corresponding to the detected gesture will be created and fed up to the Godot built in Input Event system so  it triggers functions like [`_input(InputEvent event)`](https://docs.godotengine.org/en/3.4/classes/class_node.html#class-node-method-input). There is also a signal for each gesture if you prefer using signals to the aforementioned. 
 
-This asset was ported to be added to Godot and is now a milestone to version 4.0, PR: [https://github.com/godotengine/godot/pull/36953](https://github.com/godotengine/godot/pull/36953).
+This asset was ported to be added to Godot and is now a milestone for version 4.0 ([PR](https://github.com/godotengine/godot/pull/36953)).
 
 ## How to use
 * Download the latest release from https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager/releases
 * Extract the downloaded *.zip* file somewhere in you project
-* Locate the extracted `InputManager.gd`, and [Autoload](https://docs.godotengine.org/en/3.1/getting_started/step_by_step/singletons_autoload.html) it.
+* Locate the extracted `InputManager.gd`, and [Autoload](https://docs.godotengine.org/en/3.4/tutorials/scripting/singletons_autoload.html) it.
 * Done! Now you can use the GodotTouchInputManager's [signals](#supported-gestures-and-its-signals) and its [Custom Input Events](#custom-input-events).
 
 ## Examples
@@ -35,7 +35,7 @@ This asset was ported to be added to Godot and is now a milestone to version 4.0
 ### Custom Input Events
 The purpose of these is to provide a InputEvent for the inputs that are not considered by the built-in InputsEvents.
 
-When a gesture is detected [`_input(InputEvent event)`](https://docs.godotengine.org/en/3.1/classes/class_node.html#class-node-method-input) will be called with the input event associated to the detected gesture as the `event` parameter.
+When a gesture is detected [`_input(InputEvent event)`](https://docs.godotengine.org/en/3.4/classes/class_node.html#class-node-method-input) will be called with the input event associated to the detected gesture as the `event` parameter.
 
 
 #### InputEventScreenPinch
@@ -95,7 +95,7 @@ To enable single finger gestures go to **Project > Project Settings > Input Devi
 | Multiple finger drag      | Middle click                                      |
 
 ## Versioning
-Using [SemVer](http://semver.org/) for versioning. For the versions available, see the [releases](https://github.com/Federico-Ciuffardi/IOSU/releases) 
+Using [SemVer](http://semver.org/) for versioning. For the versions available, see the [releases](https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager/releases) 
 
 ## Authors
 * Federico Ciuffardi
