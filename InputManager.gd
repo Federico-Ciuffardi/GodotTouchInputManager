@@ -83,9 +83,10 @@ func _unhandled_input(event):
 				first_touch = event
 				if tap_delay_timer.is_stopped(): tap_delay_timer.start(TAP_TIME_THRESHOLD)
 			else:
-				single_touch_cancelled = true
 				cancel_single_drag()
-				emit("single_touch", InputEventSingleScreenTouch.new(first_touch, true))
+				if !single_touch_cancelled :
+					single_touch_cancelled = true
+					emit("single_touch", InputEventSingleScreenTouch.new(first_touch, true))
 		else:
 			touches.erase(event.get_index())
 			drags.erase(event.get_index())
