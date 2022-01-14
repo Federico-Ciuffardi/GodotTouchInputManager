@@ -84,6 +84,7 @@ When a gesture is detected [`_input(InputEvent event)`](https://docs.godotengine
 |-----------------------------------------------------------------------------------------|--------------|------------------------------------------------------------------------|
 | [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) | position     | Tap position.                                                          |
 | [boolean](https://docs.godotengine.org/en/3.0/classes/class_bool.html)                  | pressed      | If it is `true`, the touch is beginning. If it is `false`, the touch is ending.  |
+| [boolean](https://docs.godotengine.org/en/3.0/classes/class_bool.html)                  | cancelled    | If it is `true`, the touch has been cancelled by another touch. If it is `false`, the touch is still the only one.  |
 
 ### Mouse to gesture
 To enable single finger gestures go to **Project > Project Settings > Input Devices > Pointing** and turn on *Emulate Touch From Mouse* to emulate a single finger press with the left click. For the other gestures 

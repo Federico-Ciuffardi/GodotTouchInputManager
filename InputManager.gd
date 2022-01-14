@@ -24,7 +24,8 @@ var touches = {} # Keeps track of all the touches.
 var drags = {}   # Keeps track of all the drags.
 
 var tap_delay_timer = Timer.new()
-var only_touch = null # Last touch if there wasn't another touch at the same time.
+var first_touch = null # single touch in progress
+var single_touch_cancelled = false
 
 var drag_startup_timer = Timer.new()
 var drag_enabled = false 
@@ -69,7 +70,7 @@ func _unhandled_input(event):
 				var rel1 = event.position - last_mouse_press.position
 				var rel2 = rel1 + event.relative
 				emit("twist", InputEventScreenTwist.new({"position": last_mouse_press.position,
-													     "relative": rel1.angle_to(rel2),
+														 "relative": rel1.angle_to(rel2),
 														 "speed": event.speed}))
 	
 	# Touch.
@@ -77,21 +78,25 @@ func _unhandled_input(event):
 		if event.pressed:
 			touches[event.get_index()] = event 
 			if (event.get_index() == 0): # First and only touch.
-				emit("single_touch", InputEventSingleScreenTouch.new(event))
-				only_touch = event
+				single_touch_cancelled = false
+				emit("single_touch", InputEventSingleScreenTouch.new(event, false))
+				first_touch = event
 				if tap_delay_timer.is_stopped(): tap_delay_timer.start(TAP_TIME_THRESHOLD)
 			else:
-				only_touch = null
 				cancel_single_drag()
+				if !single_touch_cancelled :
+					single_touch_cancelled = true
+					emit("single_touch", InputEventSingleScreenTouch.new(first_touch, true))
 		else:
 			touches.erase(event.get_index())
 			drags.erase(event.get_index())
 			cancel_single_drag()
-			if only_touch:
-				emit("single_touch", InputEventSingleScreenTouch.new(event))
-				if !tap_delay_timer.is_stopped(): 
+			if (event.get_index() == 0):
+				emit("single_touch", InputEventSingleScreenTouch.new(event, single_touch_cancelled))
+				if (!single_touch_cancelled and !tap_delay_timer.is_stopped()): 
 					tap_delay_timer.stop()
-					emit("single_tap", InputEventSingleScreenTap.new(only_touch))
+					emit("single_tap", InputEventSingleScreenTap.new(first_touch))
+				first_touch = null
 		
 	elif event is InputEventScreenDrag:
 		drags[event.index] = event
