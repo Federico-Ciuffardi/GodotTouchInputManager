@@ -25,12 +25,11 @@ This asset was ported to be added to Godot and is now a milestone for version 4.
 | Single finger tap         | single_tap   | [InputEventSingleScreenTap](#inputeventsinglescreentap)     |
 | Single finger touch       | single_touch | [InputEventSingleScreenTouch](#inputeventsinglescreentouch) |
 | Single finger drag        | single_drag  | [InputEventSingleScreenDrag](#inputeventsinglescreendrag)   |
+| Single finger swipe       | single_swipe | [InputEventSingleScreenSwipe](#inputeventsinglescreenswipe) |
 | Pinch                     | pinch        | [InputEventScreenPinch](#inputeventscreenpinch)             |
 | Multiple finger drag      | multi_drag   | [InputEventMultiScreenDrag](#inputeventmultiscreendrag)     |
 | Twist                     | twist        | [InputEventScreenTwist](#inputeventscreentwist)             |
 | any gesture               | any_gesture  | signal_name, InputEvent                                     | 
-
-
 
 ### Custom Input Events
 The purpose of these is to provide a InputEvent for the inputs that are not considered by the built-in InputsEvents.
@@ -54,6 +53,14 @@ When a gesture is detected [`_input(InputEvent event)`](https://docs.godotengine
 | [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) | position     | SingleScreenDrag position.                                    |
 | [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) | relative     | SingleScreenDrag position relative to its start position.     |
 | [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) | speed        | SingleScreenDrag speed.                                       |
+
+#### InputEventSingleScreenSwipe
+
+| Type                                                                                    | Name     | Description                                                        |
+|-----------------------------------------------------------------------------------------|----------|--------------------------------------------------------------------|
+| [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) | position | SingleScreenSwipe initial position.                                |
+| [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) | relative | SingleScreenSwipe final position relative to its initial position. |
+| [Vector2](https://docs.godotengine.org/en/3.1/classes/class_vector2.html#class-vector2) | speed    | SingleScreenSwipe speed.                                           |
 
 #### InputEventMultiScreenDrag
 

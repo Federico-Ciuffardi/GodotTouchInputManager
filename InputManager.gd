@@ -1,10 +1,25 @@
 extends Node
 
+# Const.
+const SEC_IN_USEC = 1000000
+
+## Config.
+const debug = false
+
+const DRAG_STARTUP_TIME = 0.02
+
+const TAP_TIME_THRESHOLD     = 0.2 * SEC_IN_USEC
+const TAP_DISTANCE_THRESHOLD = 25
+
+const SWIPE_TIME_THRESHOLD     = 0.5 * SEC_IN_USEC
+const SWIPE_DISTANCE_THRESHOLD = 200
+
 # Signals.
 # warning-ignore-all:unused_signal
 signal single_tap
 signal single_touch
 signal single_drag
+signal single_swipe
 signal multi_drag
 signal pinch
 signal twist
@@ -13,27 +28,23 @@ signal any_gesture
 # Enum.
 enum Gestures {PINCH, MULTI_DRAG, TWIST}
 
-# Constants.
-const debug = false
-const DRAG_STARTUP_TIME = 0.02
-const TAP_TIME_THRESHOLD = 0.2
-
 # Control.
 var last_mouse_press = null  # Last mouse button pressed.
 var touches = {} # Keeps track of all the touches.
 var drags = {}   # Keeps track of all the drags.
 
 var tap_delay_timer = Timer.new()
+var swipe_delay_timer = Timer.new()
 var first_touch = null # single touch in progress
 var single_touch_cancelled = false
 
 var drag_startup_timer = Timer.new()
 var drag_enabled = false 
 
+var first_touch_time = null
 
 ## Creates the required timers and connects their timeouts.
 func _ready():
-	_add_timer(tap_delay_timer, null)
 	_add_timer(drag_startup_timer, "on_drag_startup_timeout")
 
 
@@ -81,7 +92,7 @@ func _unhandled_input(event):
 				single_touch_cancelled = false
 				emit("single_touch", InputEventSingleScreenTouch.new(event, false))
 				first_touch = event
-				if tap_delay_timer.is_stopped(): tap_delay_timer.start(TAP_TIME_THRESHOLD)
+				first_touch_time = OS.get_ticks_usec()
 			else:
 				cancel_single_drag()
 				if !single_touch_cancelled :
@@ -93,11 +104,14 @@ func _unhandled_input(event):
 			cancel_single_drag()
 			if (event.get_index() == 0):
 				emit("single_touch", InputEventSingleScreenTouch.new(event, single_touch_cancelled))
-				if (!single_touch_cancelled and !tap_delay_timer.is_stopped()): 
-					tap_delay_timer.stop()
-					emit("single_tap", InputEventSingleScreenTap.new(first_touch))
+				if !single_touch_cancelled:
+					var distance = (event.position - first_touch.position).length()
+					var elapsed_time = OS.get_ticks_usec() - first_touch_time 
+					if elapsed_time < TAP_TIME_THRESHOLD and distance <= TAP_DISTANCE_THRESHOLD:
+							emit("single_tap", InputEventSingleScreenTap.new(first_touch))
+					if elapsed_time < SWIPE_TIME_THRESHOLD and distance > SWIPE_DISTANCE_THRESHOLD:
+							emit("single_swipe", InputEventSingleScreenSwipe.new(first_touch, event, float(elapsed_time)/SEC_IN_USEC))
 				first_touch = null
-		
 	elif event is InputEventScreenDrag:
 		drags[event.index] = event
 		if !complex_gesture_in_progress():
