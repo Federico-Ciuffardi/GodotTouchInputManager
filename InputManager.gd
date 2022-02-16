@@ -50,8 +50,33 @@ func _ready():
 
 ## Handles all unhandled inputs emiting the corresponding signals.
 func _unhandled_input(event):
+	# Keyboard to gesture.
+	var swipe_emulation_dir = null
+	if _action_pressed(event, "swipe_up"):
+		swipe_emulation_dir = Vector2.UP
+	elif _action_pressed(event,"swipe_up_right"):
+		swipe_emulation_dir = Vector2.UP + Vector2.RIGHT
+	elif _action_pressed(event,"swipe_right"):
+		swipe_emulation_dir = Vector2.RIGHT
+	elif _action_pressed(event,"swipe_down_right"):
+		swipe_emulation_dir = Vector2.DOWN + Vector2.RIGHT
+	elif _action_pressed(event,"swipe_down"):
+		swipe_emulation_dir = Vector2.DOWN
+	elif _action_pressed(event,"swipe_down_left"):
+		swipe_emulation_dir = Vector2.DOWN + Vector2.LEFT
+	elif _action_pressed(event,"swipe_left"):
+		swipe_emulation_dir = Vector2.LEFT
+	elif _action_pressed(event,"swipe_up_left"):
+		swipe_emulation_dir = Vector2.UP + Vector2.LEFT
+
+	if swipe_emulation_dir:
+		var position = get_viewport().get_mouse_position()
+		var relative = swipe_emulation_dir*SWIPE_DISTANCE_THRESHOLD*2
+		var dt       = float(SWIPE_TIME_THRESHOLD)/SEC_IN_USEC
+		emit("single_swipe", InputEventSingleScreenSwipe.new(position, position + relative, dt))
+
 	# Mouse to gesture.
-	if event is InputEventMouseButton:
+	elif event is InputEventMouseButton:
 		if event.pressed:
 			if event.button_index == BUTTON_WHEEL_DOWN:
 				emit("pinch", InputEventScreenPinch.new({
@@ -84,7 +109,7 @@ func _unhandled_input(event):
 														 "relative": rel1.angle_to(rel2),
 														 "speed": event.speed}))
 	
-	# Touch.
+	# Native touch.
 	elif event is InputEventScreenTouch:
 		if event.pressed:
 			touches[event.get_index()] = event 
@@ -110,8 +135,9 @@ func _unhandled_input(event):
 					if elapsed_time < TAP_TIME_THRESHOLD and distance <= TAP_DISTANCE_THRESHOLD:
 							emit("single_tap", InputEventSingleScreenTap.new(first_touch))
 					if elapsed_time < SWIPE_TIME_THRESHOLD and distance > SWIPE_DISTANCE_THRESHOLD:
-							emit("single_swipe", InputEventSingleScreenSwipe.new(first_touch, event, float(elapsed_time)/SEC_IN_USEC))
+							emit("single_swipe", InputEventSingleScreenSwipe.new(first_touch.position, event.position, float(elapsed_time)/SEC_IN_USEC))
 				first_touch = null
+	# Native drag.
 	elif event is InputEventScreenDrag:
 		drags[event.index] = event
 		if !complex_gesture_in_progress():
@@ -174,6 +200,14 @@ func identify_gesture(gesture_drags):
 
 func on_drag_startup_timeout():
 	drag_enabled = !complex_gesture_in_progress() and drags.size() > 0
+
+#######
+# AUX #
+#######
+
+# Check if the action is pressed
+func _action_pressed(event, action):
+	return InputMap.has_action(action) and event.is_action_pressed(action)
 
 # Macro to add a timer and connect it's timeout to func_name.
 func _add_timer(timer, func_name):

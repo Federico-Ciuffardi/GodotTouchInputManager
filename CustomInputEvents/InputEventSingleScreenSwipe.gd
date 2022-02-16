@@ -5,9 +5,9 @@ var position
 var relative 
 var speed 
 
-func _init(e1, e2, dt):
-	position = e1.position
-	relative = e2.position - e1.position
+func _init(p1, p2, dt):
+	position = p1
+	relative = p2 - p1
 	speed = relative/dt
 
 
