@@ -5,13 +5,14 @@ var position
 var relative 
 var speed 
 var fingers 
+var rawGesture 
 
-func _init(p1, p2, dt, f):
-	position = p1
-	relative = p2 - p1
-	speed = relative/dt
-	fingers = f
-
+func _init(_rawGesture : RawGesture):
+	rawGesture = _rawGesture
+	fingers = rawGesture.size()
+	position = rawGesture.centroid("presses", "position")
+	relative = rawGesture.centroid("releases", "position") - position
+	speed = relative/rawGesture.elapsed_time
 
 func as_text():
 	return "InputEventSingleScreenSwipe : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed) + ", fingers=" + str(fingers)

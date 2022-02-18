@@ -4,36 +4,23 @@ extends InputEventAction
 var position
 var relative
 var speed
+var fingers 
+var rawGesture 
 
-func _init(dict):
-	if dict.has("position"):
-		position = dict["position"] 
-		relative = dict["relative"] 
-		speed    = dict["speed"] 
-	else:
-		position = get_events_property_avg(dict, "position")
-		speed    = get_events_property_avg_length(dict, "speed")
+func _init(_rawGesture : RawGesture):
+	rawGesture = _rawGesture
+	fingers  = rawGesture.drags.size()
+	position = rawGesture.centroid("drags", "position")
 		
-		relative = 0
-		for e in dict.values():
-			relative += (e.position - position).angle_to(e.position + (e.relative / dict.size()) - position)
-		relative = (relative / dict.size())
+	speed    = 0
+	relative = 0
+	for drag in rawGesture.drags.values():
+		speed += drag.speed.length()
+		var centroid_relative_position = drag.position - position
+		relative += centroid_relative_position.angle_to(centroid_relative_position + (drag.relative / fingers))
+	relative /= fingers
+	speed    /= fingers
 
 
 func as_text():
-	return "InputEventScreenTwist : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed)
-
-
-# Aux.
-func get_events_property_avg(events, property):
-	var sum = Vector2()
-	for e in events.values():
-		sum += e.get(property)
-	return sum / events.size()
-
-
-func get_events_property_avg_length(events, property):
-	var sum = 0
-	for e in events.values():
-		sum += e.get(property).length()
-	return sum / events.size()
+	return "InputEventScreenTwist : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed) +", fingers=" + str(fingers)

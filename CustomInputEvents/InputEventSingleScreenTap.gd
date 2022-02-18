@@ -1,10 +1,12 @@
 class_name InputEventSingleScreenTap
 extends InputEventAction
 
-var position
+var position   : Vector2
+var rawGesture : RawGesture
 
-func _init(e):
-	position = e.position
+func _init(_rawGesture : RawGesture):
+	rawGesture = _rawGesture
+	position = rawGesture.presses[0].position
 
 
 func as_text():

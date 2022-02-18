@@ -4,11 +4,13 @@ extends InputEventAction
 var position
 var relative 
 var speed 
+var rawGesture
 
-func _init(p1, p2, dt):
-	position = p1
-	relative = p2 - p1
-	speed = relative/dt
+func _init(_rawGesture : RawGesture):
+	rawGesture = _rawGesture
+	position = rawGesture.presses[0].position
+	relative = rawGesture.releases[0].position - position
+	speed = relative/rawGesture.elapsed_time
 
 
 func as_text():

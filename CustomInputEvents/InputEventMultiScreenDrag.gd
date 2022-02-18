@@ -4,25 +4,15 @@ extends InputEventAction
 var position
 var relative
 var speed
+var fingers 
+var rawGesture 
 
-func _init(dict):
-	if dict.has("position"):
-		self.position = dict["position"] 
-		self.relative = dict["relative"] 
-		self.speed    = dict["speed"] 
-	else:
-		self.position = get_events_property_avg(dict,"position")
-		self.relative = get_events_property_avg(dict,"relative") / dict.size()
-		self.speed    = get_events_property_avg(dict,"speed")
-
+func _init(_rawGesture : RawGesture):
+	rawGesture = _rawGesture
+	fingers  = rawGesture.size()
+	position = rawGesture.centroid("drags", "position")
+	relative = rawGesture.centroid("drags", "relative")/fingers
+	speed    = rawGesture.centroid("drags", "speed")
 
 func as_text():
-	return "InputEventMultiScreenDrag : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed)
-
-
-# Aux.
-func get_events_property_avg(events, property):
-	var sum = Vector2()
-	for e in events.values():
-		sum += e.get(property)
-	return sum / events.size()
+	return "InputEventMultiScreenDrag : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed) + ", fingers=" + str(fingers)
