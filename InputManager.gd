@@ -21,6 +21,8 @@ signal single_touch
 signal single_drag
 signal single_swipe
 signal multi_drag
+signal multi_tap
+signal multi_swipe
 signal pinch
 signal twist
 signal any_gesture
@@ -33,15 +35,15 @@ var last_mouse_press = null  # Last mouse button pressed.
 var touches = {} # Keeps track of all the touches.
 var drags = {}   # Keeps track of all the drags.
 
+var max_touch = 0
+
 var tap_delay_timer = Timer.new()
 var swipe_delay_timer = Timer.new()
-var first_touch = null # single touch in progress
 var single_touch_cancelled = false
 
 var drag_startup_timer = Timer.new()
 var drag_enabled = false 
 
-var first_touch_time = null
 
 ## Creates the required timers and connects their timeouts.
 func _ready():
@@ -112,31 +114,37 @@ func _unhandled_input(event):
 	# Native touch.
 	elif event is InputEventScreenTouch:
 		if event.pressed:
-			touches[event.get_index()] = event 
+			touches[event.get_index()] = {"event": event, "time": OS.get_ticks_usec()}
+			max_touch = max(max_touch,event.index)
 			if (event.get_index() == 0): # First and only touch.
 				single_touch_cancelled = false
 				emit("single_touch", InputEventSingleScreenTouch.new(event, false))
-				first_touch = event
-				first_touch_time = OS.get_ticks_usec()
 			else:
 				cancel_single_drag()
 				if !single_touch_cancelled :
 					single_touch_cancelled = true
-					emit("single_touch", InputEventSingleScreenTouch.new(first_touch, true))
+					emit("single_touch", InputEventSingleScreenTouch.new(touches[0]["event"], true))
 		else:
+			if event.get_index() == 0:
+				emit("single_touch", InputEventSingleScreenTouch.new(event, single_touch_cancelled))
+				if !single_touch_cancelled:
+					var distance = (event.position - touches[0]["event"].position).length()
+					var elapsed_time = OS.get_ticks_usec() - touches[0]["time"] 
+					if elapsed_time < TAP_TIME_THRESHOLD and distance <= TAP_DISTANCE_THRESHOLD:
+							emit("single_tap", InputEventSingleScreenTap.new(touches[0]["event"]))
+					if elapsed_time < SWIPE_TIME_THRESHOLD and distance > SWIPE_DISTANCE_THRESHOLD:
+							emit("single_swipe", InputEventSingleScreenSwipe.new(touches[0]["event"].position, event.position, float(elapsed_time)/SEC_IN_USEC))
+			if single_touch_cancelled and touches.size() == 1:
+				var distance = (event.position - touches[event.index]["event"].position).length()
+				var elapsed_time = OS.get_ticks_usec() - touches[event.index]["time"] 
+				if elapsed_time < TAP_TIME_THRESHOLD and distance <= TAP_DISTANCE_THRESHOLD:
+						emit("multi_tap", InputEventMultiScreenTap.new(touches[event.index]["event"], max_touch+1))
+				if elapsed_time < SWIPE_TIME_THRESHOLD and distance > SWIPE_DISTANCE_THRESHOLD:
+						emit("multi_swipe", InputEventMultiScreenSwipe.new(touches[event.index]["event"].position, event.position, float(elapsed_time)/SEC_IN_USEC, max_touch+1))
+				max_touch = 0
 			touches.erase(event.get_index())
 			drags.erase(event.get_index())
 			cancel_single_drag()
-			if (event.get_index() == 0):
-				emit("single_touch", InputEventSingleScreenTouch.new(event, single_touch_cancelled))
-				if !single_touch_cancelled:
-					var distance = (event.position - first_touch.position).length()
-					var elapsed_time = OS.get_ticks_usec() - first_touch_time 
-					if elapsed_time < TAP_TIME_THRESHOLD and distance <= TAP_DISTANCE_THRESHOLD:
-							emit("single_tap", InputEventSingleScreenTap.new(first_touch))
-					if elapsed_time < SWIPE_TIME_THRESHOLD and distance > SWIPE_DISTANCE_THRESHOLD:
-							emit("single_swipe", InputEventSingleScreenSwipe.new(first_touch.position, event.position, float(elapsed_time)/SEC_IN_USEC))
-				first_touch = null
 	# Native drag.
 	elif event is InputEventScreenDrag:
 		drags[event.index] = event
