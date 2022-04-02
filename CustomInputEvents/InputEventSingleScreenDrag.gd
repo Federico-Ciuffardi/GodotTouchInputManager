@@ -1,10 +1,10 @@
 class_name InputEventSingleScreenDrag
 extends InputEventAction
 
-var position
-var relative
-var speed
-var rawGesture
+var position   : Vector2
+var relative   : Vector2
+var speed      : Vector2
+var rawGesture : RawGesture
 
 func _init(_rawGesture : RawGesture):
 	rawGesture = _rawGesture
