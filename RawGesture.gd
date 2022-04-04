@@ -73,13 +73,16 @@ func isConsistent(diff_limit : float, length_limit : float = -1) -> bool:
 
 	return valid
 
-func rollback(time : float) -> Array:
+func rollback_relative(time : float) -> Array:
+	return rollback_absolute(start_time+elapsed_time - time)
+
+func rollback_absolute(time : float) -> Array:
 	var discarded_events : Array = []
 	var rg : RawGesture = copy()
-	var latest_event_id : Array = rg.latest_event_id(rg.start_time+rg.elapsed_time - time)
+
+	var latest_event_id : Array = rg.latest_event_id(time)
 	while !latest_event_id.empty():
-		# print(latest_event_id)
-		var latest_index : int    = latest_event_id[0]
+		var latest_index  : int    = latest_event_id[0]
 		var latest_type   : String = latest_event_id[1]
 		var latest_event = rg.history[latest_index][latest_type].pop_back()
 		discarded_events.append(latest_event)
@@ -89,40 +92,42 @@ func rollback(time : float) -> Array:
 			rg.active_touches += 1
 		if rg.history[latest_index][latest_type].empty():
 			rg.history[latest_index].erase(latest_type)
-			if rg.history.empty():
+			if rg.history[latest_index].empty():
 				rg.history.erase(latest_index)
-		latest_event_id = rg.latest_event_id(rg.start_time+rg.elapsed_time - time)
+		latest_event_id = rg.latest_event_id(time)
 
-	for index in rg.presses:
-		if rg.history[index].has("presses"):
-			var presses_history: Array = rg.history[index]["presses"]
-			if presses_history.empty():
-				rg.presses.erase(index)
-			else:
+	for index in rg.presses.keys():
+		if rg.history.has(index):
+			if rg.history[index].has("presses"):
+				var presses_history: Array = rg.history[index]["presses"]
 				rg.presses[index] = presses_history.back()
-
-	for index in rg.releases:
-		if rg.history[index].has("releases"):
-			var releases_history : Array = rg.history[index]["releases"]
-			# !releases_history.empty() -> rg.presses.has(index) (touch precedes a release)
-			if releases_history.empty() or releases_history.back().time < rg.presses[index].time: 
-				rg.releases.erase(index)
 			else:
-				rg.releases[index] = releases_history.back()
+				rg.presses.erase(index)
 
-	for index in rg.drags:
-		if rg.history[index].has("drags"):
-			var drags_history : Array = rg.history[index]["drags"]
-			# rg.releases.has(index) -> rg.releases[index].time >= rg.presses[index].time ->
-			# rg.releases[index] >= drags_history.back().time (drag should needs a new touch after the release)
-			if drags_history.empty() or rg.releases.has(index):
-				rg.releases.erase(index)
+			if rg.history[index].has("releases"):
+				var releases_history : Array = rg.history[index]["releases"]
+				# !releases_history.empty() -> rg.presses.has(index) (touch precedes a release)
+				if releases_history.back().time < rg.presses[index].time: 
+					rg.releases.erase(index)
+				else:
+					rg.releases[index] = releases_history.back()
 			else:
-				rg.drags[index] = drags_history.back()
+				rg.releases.erase(index)
 
-	for index in rg.history.keys():
-		if rg.history[index].empty():
-			rg.history.erase(index)
+			if rg.history[index].has("drags"):
+				var drags_history : Array = rg.history[index]["drags"]
+				# rg.releases.has(index) -> rg.releases[index].time >= rg.presses[index].time ->
+				# rg.releases[index] >= drags_history.back().time (drag should needs a new touch after the release)
+				if rg.releases.has(index):
+					rg.drags.erase(index)
+				else:
+					rg.drags[index] = drags_history.back()
+			else:
+				rg.drags.erase(index)
+		else:
+			rg.presses.erase(index)
+			rg.releases.erase(index)
+			rg.drags.erase(index)
 
 	return [rg, discarded_events]
 
@@ -142,7 +147,7 @@ func latest_event_id(latest_time : float = -1) -> Array:
 	for index in history:
 		for type in history[index]:
 			var event_time = history[index][type].back().time
-			if event_time > latest_time:
+			if event_time >= latest_time:
 				res = [index, type]
 				latest_time = event_time
 	return res

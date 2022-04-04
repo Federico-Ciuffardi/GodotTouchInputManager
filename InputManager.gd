@@ -102,7 +102,7 @@ func _handle_mouse_button(event : InputEventMouseButton) -> void:
 			_updateRGScreenDrag(rg, _native_drag_event(0,position+distance,relative,relative/elapsed_time), last_event_time)
 			_updateRGScreenDrag(rg, _native_drag_event(1,position-distance,-relative,-relative/elapsed_time), last_event_time)
 
-			_emit("pinch", InputEventScreenPinch.new(rg))
+			_emit("pinch", InputEventScreenPinch.new(rg, last_event_time))
 	else:
 		_last_mouse_press = null
 		
@@ -121,7 +121,7 @@ func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 			_updateRGScreenDrag(rg, _native_drag_event(0,position+distance,relative,speed), last_event_time)
 			_updateRGScreenDrag(rg, _native_drag_event(1,position-distance,relative,speed), last_event_time)
 
-			_emit("multi_drag", InputEventMultiScreenDrag.new(rg))
+			_emit("multi_drag", InputEventMultiScreenDrag.new(rg, last_event_time))
 
 		elif _last_mouse_press.button_index == BUTTON_RIGHT:
 			var rel1 : Vector2 = event.position - _last_mouse_press.position
@@ -139,7 +139,7 @@ func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 			_updateRGScreenDrag(rg, _native_drag_event(0,position+distance,distance.rotated(angle) - distance ,speed), last_event_time)
 			_updateRGScreenDrag(rg, _native_drag_event(1,position-distance,distance.rotated(-angle) - distance ,speed), last_event_time)
 
-			_emit("twist", InputEventScreenTwist.new(rg))
+			_emit("twist", InputEventScreenTwist.new(rg, last_event_time))
 
 func _handle_screen_touch(event : InputEventScreenTouch) -> void:
 	_updateRGScreenTouch(rawGesture, event)
@@ -180,11 +180,11 @@ func _handle_screen_drag(event : InputEventScreenDrag) -> void:
 		_cancel_single_drag()
 		var gesture : int = _identify_gesture(rawGesture)
 		if gesture == Gesture.PINCH:
-			_emit("pinch", InputEventScreenPinch.new(rawGesture))
+			_emit("pinch", InputEventScreenPinch.new(rawGesture, last_event_time))
 		elif gesture == Gesture.MULTI_DRAG:
-			_emit("multi_drag", InputEventMultiScreenDrag.new(rawGesture))
+			_emit("multi_drag", InputEventMultiScreenDrag.new(rawGesture, last_event_time))
 		elif gesture == Gesture.TWIST:
-			_emit("twist",InputEventScreenTwist.new(rawGesture))
+			_emit("twist",InputEventScreenTwist.new(rawGesture, last_event_time))
 	else:
 		if _single_drag_enabled:
 			_emit("single_drag", InputEventSingleScreenDrag.new(rawGesture))
