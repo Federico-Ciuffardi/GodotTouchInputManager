@@ -7,9 +7,7 @@ class_name RawGesture
 # Const #
 #########
 
-var Util : Object = preload("Util.gd")
-
-const SEC_IN_USEC : int = 1000000
+const Util : Object = preload("Util.gd")
 
 ###########
 # Classes #
@@ -149,8 +147,21 @@ func latest_event_id(latest_time : float = -1) -> Array:
 				latest_time = event_time
 	return res
 
+func as_text() -> String:
+	var txt = "presses: "
+	for index in presses:
+		txt += "("+str(index)+":"+str(presses[index].time)+") "
+	txt += "\ndrags: "
+	for index in drags:
+		txt += "("+str(index)+":"+str(drags[index].time)+") "
+	txt += "\nreleases: "
+	for index in releases:
+		txt += "("+str(index)+":"+str(releases[index].time)+") "
+	return txt
+
 func _updateScreenDrag(event : InputEventScreenDrag, time : float = -1) -> void:
-	time = _now() if time < 0 else time
+	if time < 0:
+		time = Util._now()
 	var drag : Drag = Drag.new()
 	drag.position  = event.position
 	drag.relative  = event.relative
@@ -162,7 +173,8 @@ func _updateScreenDrag(event : InputEventScreenDrag, time : float = -1) -> void:
 	elapsed_time = time - start_time
 	
 func _updateScreenTouch(event : InputEventScreenTouch, time : float = -1) -> void:
-	time = _now() if time < 0 else time
+	if time < 0:
+		time = Util._now()
 	var touch : Touch = Touch.new()
 	touch.position = event.position
 	touch.pressed  = event.pressed
@@ -175,7 +187,7 @@ func _updateScreenTouch(event : InputEventScreenTouch, time : float = -1) -> voi
 		releases.erase(event.index)
 		drags.erase(event.index)
 		if active_touches == 1:
-			start_time = touch.time
+			start_time = time
 	else:
 		_add_history(event.index, "releases", touch)
 		releases[event.index] = touch
@@ -189,6 +201,3 @@ func _add_history(index : int, type : String, value) -> void:
 	if !history[index].has(type): 
 		history[index][type] = []
 	history[index][type].append(value)
-
-func _now() -> float:
-	return float(OS.get_ticks_usec())/SEC_IN_USEC

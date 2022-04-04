@@ -23,7 +23,7 @@ const SWIPE_DISTANCE_THRESHOLD : float = 200.0
 # CONST #
 #########
 
-const SEC_IN_USEC : int = 1000000
+const Util : Object = preload("Util.gd")
 
 ###########
 # Signals #
@@ -51,6 +51,8 @@ enum Gesture {PINCH, MULTI_DRAG, TWIST}
 # Vars #
 ########
 
+var last_event_time : float = -1.0
+
 var rawGesture : RawGesture = RawGesture.new() # Current rawGesture
 
 var _last_mouse_press : InputEventMouseButton = null  # Last mouse button pressed
@@ -70,12 +72,16 @@ func _ready() -> void:
 func _unhandled_input(event : InputEvent) -> void:
 	if event is InputEventScreenDrag:
 		_handle_screen_drag(event)
+		last_event_time = Util._now()
 	elif event is InputEventScreenTouch:
 		_handle_screen_touch(event)
+		last_event_time = Util._now()
 	elif event is InputEventMouseMotion:
 		_handle_mouse_motion(event)
+		last_event_time = Util._now()
 	elif event is InputEventMouseButton:
 		_handle_mouse_button(event)
+		last_event_time = Util._now()
 	else:
 		_handle_action(event)
 
@@ -89,13 +95,12 @@ func _handle_mouse_button(event : InputEventMouseButton) -> void:
 			if event.button_index == BUTTON_WHEEL_DOWN:
 				relative = -relative
 			var elapsed_time : float = SWIPE_TIME_LIMIT
-			var now          : float = float(OS.get_ticks_usec())/SEC_IN_USEC
 
 			var rg : RawGesture = RawGesture.new()
-			_updateRGScreenTouch(rg, _native_touch_event(0,position+distance,true), now - elapsed_time)
-			_updateRGScreenTouch(rg, _native_touch_event(1,position-distance,true), now - elapsed_time)
-			_updateRGScreenDrag(rg, _native_drag_event(0,position+distance,relative,relative/elapsed_time), now)
-			_updateRGScreenDrag(rg, _native_drag_event(1,position-distance,-relative,-relative/elapsed_time), now)
+			_updateRGScreenTouch(rg, _native_touch_event(0,position+distance,true), last_event_time - elapsed_time)
+			_updateRGScreenTouch(rg, _native_touch_event(1,position-distance,true), last_event_time - elapsed_time)
+			_updateRGScreenDrag(rg, _native_drag_event(0,position+distance,relative,relative/elapsed_time), last_event_time)
+			_updateRGScreenDrag(rg, _native_drag_event(1,position-distance,-relative,-relative/elapsed_time), last_event_time)
 
 			_emit("pinch", InputEventScreenPinch.new(rg))
 	else:
@@ -109,13 +114,12 @@ func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 			var relative : Vector2 = event.relative
 			var speed    : Vector2 = event.speed
 			var elapsed_time : float = relative.length()/speed.length()
-			var now          : float = float(OS.get_ticks_usec())/SEC_IN_USEC
 
 			var rg : RawGesture = RawGesture.new()
-			_updateRGScreenTouch(rg, _native_touch_event(0,position+distance,true), now - elapsed_time)
-			_updateRGScreenTouch(rg, _native_touch_event(1,position-distance,true), now - elapsed_time)
-			_updateRGScreenDrag(rg, _native_drag_event(0,position+distance,relative,speed), now)
-			_updateRGScreenDrag(rg, _native_drag_event(1,position-distance,relative,speed), now)
+			_updateRGScreenTouch(rg, _native_touch_event(0,position+distance,true), last_event_time - elapsed_time)
+			_updateRGScreenTouch(rg, _native_touch_event(1,position-distance,true), last_event_time - elapsed_time)
+			_updateRGScreenDrag(rg, _native_drag_event(0,position+distance,relative,speed), last_event_time)
+			_updateRGScreenDrag(rg, _native_drag_event(1,position-distance,relative,speed), last_event_time)
 
 			_emit("multi_drag", InputEventMultiScreenDrag.new(rg))
 
@@ -128,13 +132,12 @@ func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 			var distance : Vector2 = Vector2(0,200)
 			var speed    : Vector2 = event.speed
 			var elapsed_time : float = event.relative.length()/speed.length()
-			var now          : float = float(OS.get_ticks_usec())/SEC_IN_USEC
 
 			var rg : RawGesture = RawGesture.new()
-			_updateRGScreenTouch(rg, _native_touch_event(0,position+distance,true), now - elapsed_time)
-			_updateRGScreenTouch(rg, _native_touch_event(1,position-distance,true), now - elapsed_time)
-			_updateRGScreenDrag(rg, _native_drag_event(0,position+distance,distance.rotated(angle) - distance ,speed), now)
-			_updateRGScreenDrag(rg, _native_drag_event(1,position-distance,distance.rotated(-angle) - distance ,speed), now)
+			_updateRGScreenTouch(rg, _native_touch_event(0,position+distance,true), last_event_time - elapsed_time)
+			_updateRGScreenTouch(rg, _native_touch_event(1,position-distance,true), last_event_time - elapsed_time)
+			_updateRGScreenDrag(rg, _native_drag_event(0,position+distance,distance.rotated(angle) - distance ,speed), last_event_time)
+			_updateRGScreenDrag(rg, _native_drag_event(1,position-distance,distance.rotated(-angle) - distance ,speed), last_event_time)
 
 			_emit("twist", InputEventScreenTwist.new(rg))
 
@@ -211,11 +214,10 @@ func _handle_action(event : InputEvent) -> void:
 		var position : Vector2 = get_viewport().get_mouse_position()
 		var relative : Vector2 = swipe_emulation_dir*SWIPE_DISTANCE_THRESHOLD*2
 		var elapsed_time : float = SWIPE_TIME_LIMIT
-		var now          : float = float(OS.get_ticks_usec())/SEC_IN_USEC
 
 		var rg : RawGesture = RawGesture.new()
-		_updateRGScreenTouch(rg, _native_touch_event(0,position,true), now - elapsed_time)
-		_updateRGScreenTouch(rg, _native_touch_event(0,position+relative,false), now)
+		_updateRGScreenTouch(rg, _native_touch_event(0,position,true), last_event_time - elapsed_time)
+		_updateRGScreenTouch(rg, _native_touch_event(0,position+relative,false), last_event_time)
 
 		_emit("single_swipe", InputEventSingleScreenSwipe.new(rg))
 
@@ -278,11 +280,11 @@ func _native_drag_event(index : int, position : Vector2, relative : Vector2, spe
 	return native_drag
 
 func _updateRGScreenTouch(rg : RawGesture, event : InputEventScreenTouch, time : float = -1):
-	rg.updateScreenTouch(event,time)
+	rg._updateScreenTouch(event,time)
 	_emit("raw_gesture", rg)
 
 func _updateRGScreenDrag(rg : RawGesture, event : InputEventScreenDrag, time : float = -1):
-	rg.updateScreenDrag(event,time)
+	rg._updateScreenDrag(event,time)
 	_emit("raw_gesture", rg)
 
 # Check if the action is pressed
