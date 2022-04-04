@@ -1,5 +1,6 @@
 #warning-ignore:unused_result
 
+extends InputEventAction
 class_name RawGesture 
 
 #########
