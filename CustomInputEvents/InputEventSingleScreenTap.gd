@@ -4,9 +4,10 @@ extends InputEventAction
 var position   : Vector2
 var rawGesture : RawGesture
 
-func _init(_rawGesture : RawGesture) -> void:
+func _init(_rawGesture : RawGesture = null) -> void:
 	rawGesture = _rawGesture
-	position = rawGesture.presses[0].position
+	if rawGesture:
+		position = rawGesture.presses[0].position
 
 
 func as_text() -> String:

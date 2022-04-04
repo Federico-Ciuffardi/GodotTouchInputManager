@@ -6,11 +6,12 @@ var relative   : Vector2
 var speed      : Vector2
 var rawGesture : RawGesture
 
-func _init(_rawGesture : RawGesture) -> void:
+func _init(_rawGesture : RawGesture = null) -> void:
 	rawGesture = _rawGesture
-	position = rawGesture.presses[0].position
-	relative = rawGesture.releases[0].position - position
-	speed = relative/rawGesture.elapsed_time
+	if rawGesture:
+		position = rawGesture.presses[0].position
+		relative = rawGesture.releases[0].position - position
+		speed = relative/rawGesture.elapsed_time
 
 
 func as_text() -> String:
