@@ -16,11 +16,13 @@ const SEC_IN_USEC : int = 1000000
 ###########
 
 class Event:
-	var time : float = -1 # (secs)
+	var time  : float = -1 # (secs)
+	var index : int   = -1
 
 class Touch:
 	extends Event
 	var position : Vector2 = Vector2.ZERO
+	var pressed  : bool 
 
 class Drag:
 	extends Event
@@ -36,6 +38,7 @@ class Drag:
 var presses  : Dictionary # Touch
 var releases : Dictionary # Touch
 var drags    : Dictionary # Drag
+var history  : Dictionary # Array of events
 
 var active_touches : int   = 0
 
@@ -46,41 +49,13 @@ var elapsed_time   : float = -1 # (secs)
 # Functions #
 #############
 
-func updateScreenDrag(event : InputEventScreenDrag, time : float = -1) -> void:
-	time = _now() if time < 0 else time
-	var drag : Drag = Drag.new()
-	drag.position  = event.position
-	drag.relative  = event.relative
-	drag.speed     = event.speed
-	drag.time      = time
-	drags[event.index] = drag
-	elapsed_time = time - start_time
-	
-
-func updateScreenTouch(event : InputEventScreenTouch, time : float = -1) -> void:
-	time = _now() if time < 0 else time
-	var touch : Touch = Touch.new()
-	touch.position = event.position
-	touch.time     = time
-	if event.pressed:
-		presses[event.index] = touch
-		active_touches += 1
-		if active_touches == 1:
-			start_time = touch.time
-	else:
-		releases[event.index] = touch
-		active_touches -= 1
-		drags.erase(event.index)
-	elapsed_time = time - start_time
-
 func size() -> int:
 	return presses.size()
 
-func clear() -> void:
-	presses.clear()
-	releases.clear()       
-	drags.clear()
-	active_touches = 0
+func centroid(events_id : String , property_id : String):
+	var arr : Array = get(events_id).values()
+	arr = Util.map_callv(arr , "get", [property_id])
+	return Util.centroid(arr)
 
 # Check for gesture consistency
 func isConsistent(diff_limit : float, length_limit : float = -1) -> bool:
@@ -100,10 +75,120 @@ func isConsistent(diff_limit : float, length_limit : float = -1) -> bool:
 
 	return valid
 
-func centroid(events_id : String , property_id : String):
-	var arr : Array = get(events_id).values()
-	arr = Util.map_callv(arr , "get", [property_id])
-	return Util.centroid(arr)
+func rollback(time : float) -> Array:
+	var discarded_events : Array = []
+	var rg : RawGesture = copy()
+	var latest_event_id : Array = rg.latest_event_id(rg.start_time+rg.elapsed_time - time)
+	while !latest_event_id.empty():
+		# print(latest_event_id)
+		var latest_index : int    = latest_event_id[0]
+		var latest_type   : String = latest_event_id[1]
+		var latest_event = rg.history[latest_index][latest_type].pop_back()
+		discarded_events.append(latest_event)
+		if latest_type == "presses":
+			rg.active_touches -= 1
+		elif latest_type == "releases":
+			rg.active_touches += 1
+		if rg.history[latest_index][latest_type].empty():
+			rg.history[latest_index].erase(latest_type)
+			if rg.history.empty():
+				rg.history.erase(latest_index)
+		latest_event_id = rg.latest_event_id(rg.start_time+rg.elapsed_time - time)
+
+	for index in rg.presses:
+		if rg.history[index].has("presses"):
+			var presses_history: Array = rg.history[index]["presses"]
+			if presses_history.empty():
+				rg.presses.erase(index)
+			else:
+				rg.presses[index] = presses_history.back()
+
+	for index in rg.releases:
+		if rg.history[index].has("releases"):
+			var releases_history : Array = rg.history[index]["releases"]
+			# !releases_history.empty() -> rg.presses.has(index) (touch precedes a release)
+			if releases_history.empty() or releases_history.back().time < rg.presses[index].time: 
+				rg.releases.erase(index)
+			else:
+				rg.releases[index] = releases_history.back()
+
+	for index in rg.drags:
+		if rg.history[index].has("drags"):
+			var drags_history : Array = rg.history[index]["drags"]
+			# rg.releases.has(index) -> rg.releases[index].time >= rg.presses[index].time ->
+			# rg.releases[index] >= drags_history.back().time (drag should needs a new touch after the release)
+			if drags_history.empty() or rg.releases.has(index):
+				rg.releases.erase(index)
+			else:
+				rg.drags[index] = drags_history.back()
+
+	for index in rg.history.keys():
+		if rg.history[index].empty():
+			rg.history.erase(index)
+
+	return [rg, discarded_events]
+
+func copy() -> RawGesture:
+	var rg : RawGesture = get_script().new()
+	rg.presses           = presses.duplicate(true)        
+	rg.releases          = releases.duplicate(true)
+	rg.drags             = drags.duplicate(true)   
+	rg.history           = history.duplicate(true)
+	rg.active_touches    = active_touches
+	rg.start_time        = start_time    
+	rg.elapsed_time      = elapsed_time 
+	return rg 
+
+func latest_event_id(latest_time : float = -1) -> Array:
+	var res : Array = []
+	for index in history:
+		for type in history[index]:
+			var event_time = history[index][type].back().time
+			if event_time > latest_time:
+				res = [index, type]
+				latest_time = event_time
+	return res
+
+func _updateScreenDrag(event : InputEventScreenDrag, time : float = -1) -> void:
+	time = _now() if time < 0 else time
+	var drag : Drag = Drag.new()
+	drag.position  = event.position
+	drag.relative  = event.relative
+	drag.speed     = event.speed
+	drag.index     = event.index 
+	drag.time      = time
+	_add_history(event.index, "drags", drag)
+	drags[event.index] = drag
+	elapsed_time = time - start_time
+	
+func _updateScreenTouch(event : InputEventScreenTouch, time : float = -1) -> void:
+	time = _now() if time < 0 else time
+	var touch : Touch = Touch.new()
+	touch.position = event.position
+	touch.pressed  = event.pressed
+	touch.index    = event.index 
+	touch.time     = time
+	if event.pressed:
+		_add_history(event.index, "presses", touch)
+		presses[event.index] = touch
+		active_touches += 1
+		releases.erase(event.index)
+		drags.erase(event.index)
+		if active_touches == 1:
+			start_time = touch.time
+	else:
+		_add_history(event.index, "releases", touch)
+		releases[event.index] = touch
+		active_touches -= 1
+		drags.erase(event.index)
+	elapsed_time = time - start_time
+
+func _add_history(index : int, type : String, value) -> void:
+	if !history.has(index): 
+		history[index] = {}
+	if !history[index].has(type): 
+		history[index][type] = []
+	history[index][type].append(value)
 
 func _now() -> float:
 	return float(OS.get_ticks_usec())/SEC_IN_USEC
