@@ -13,5 +13,5 @@ static func centroid(es : Array):
 		sum += es[i]
 	return sum / es.size()
 
-static func _now() -> float:
+static func now() -> float:
 	return float(OS.get_ticks_usec())/SEC_IN_USEC

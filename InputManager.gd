@@ -30,16 +30,16 @@ const SWIPE_DISTANCE_THRESHOLD : float = 200.0
 const Util : Object = preload("Util.gd")
 
 const	swipe2dir : Dictionary = \
-	{
-	"swipe_up": Vector2.UP,
-	"swipe_up_right": Vector2.UP + Vector2.RIGHT,
-	"swipe_right": Vector2.RIGHT,
-	"swipe_down_right": Vector2.DOWN + Vector2.RIGHT,
-	"swipe_down": Vector2.DOWN,
-	"swipe_down_left": Vector2.DOWN + Vector2.LEFT,
-	"swipe_left": Vector2.LEFT,
-	"swipe_up_left": Vector2.UP + Vector2.LEFT
-	}
+{
+	"swipe_up"         : Vector2.UP,
+	"swipe_up_right"   : Vector2.UP + Vector2.RIGHT,
+	"swipe_right"      : Vector2.RIGHT,
+	"swipe_down_right" : Vector2.DOWN + Vector2.RIGHT,
+	"swipe_down"       : Vector2.DOWN,
+	"swipe_down_left"  : Vector2.DOWN + Vector2.LEFT,
+	"swipe_left"       : Vector2.LEFT,
+	"swipe_up_left"    : Vector2.UP + Vector2.LEFT
+}
 
 
 ###########
@@ -70,7 +70,7 @@ enum Gesture {PINCH, MULTI_DRAG, TWIST, SINGLE_DRAG, NONE}
 # Vars #
 ########
 
-var rawGesture : RawGesture = RawGesture.new() # Current rawGesture
+var raw_gesture : RawGesture = RawGesture.new() # Current raw_gesture
 
 var _mouse_event_press_position : Vector2
 var _mouse_event : int = Gesture.NONE
@@ -147,54 +147,56 @@ func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 		_emit("twist", twist_event)
 
 func _handle_screen_touch(event : InputEventScreenTouch) -> void:
-	_updateRGScreenTouch(rawGesture, event)
+	raw_gesture._update_screen_touch(event)
+	_emit("raw_gesture", raw_gesture)
 	var index : int = event.index
 	if event.pressed:
-		if rawGesture.size() == 1: # First and only touch
+		if raw_gesture.size() == 1: # First and only touch
 			_single_touch_cancelled = false
-			_emit("single_touch", InputEventSingleScreenTouch.new(rawGesture))
+			_emit("single_touch", InputEventSingleScreenTouch.new(raw_gesture))
 		elif !_single_touch_cancelled :
 				_single_touch_cancelled = true
 				_cancel_single_drag()
-				_emit("single_touch", InputEventSingleScreenTouch.new(rawGesture))
+				_emit("single_touch", InputEventSingleScreenTouch.new(raw_gesture))
 	else:
-		var fingers : int = rawGesture.size() 
+		var fingers : int = raw_gesture.size() 
 		if index == 0:
-			_emit("single_touch", InputEventSingleScreenTouch.new(rawGesture))
+			_emit("single_touch", InputEventSingleScreenTouch.new(raw_gesture))
 			if !_single_touch_cancelled:
-				var distance : float = (rawGesture.releases[0].position - rawGesture.presses[0].position).length()
-				if rawGesture.elapsed_time < TAP_TIME_LIMIT and distance <= TAP_DISTANCE_LIMIT:
-					_emit("single_tap", InputEventSingleScreenTap.new(rawGesture))
-				if rawGesture.elapsed_time < SWIPE_TIME_LIMIT and distance > SWIPE_DISTANCE_THRESHOLD:
-					_emit("single_swipe", InputEventSingleScreenSwipe.new(rawGesture))
-		if rawGesture.active_touches == 0: # last finger released
+				var distance : float = (raw_gesture.releases[0].position - raw_gesture.presses[0].position).length()
+				if raw_gesture.elapsed_time < TAP_TIME_LIMIT and distance <= TAP_DISTANCE_LIMIT:
+					_emit("single_tap", InputEventSingleScreenTap.new(raw_gesture))
+				if raw_gesture.elapsed_time < SWIPE_TIME_LIMIT and distance > SWIPE_DISTANCE_THRESHOLD:
+					_emit("single_swipe", InputEventSingleScreenSwipe.new(raw_gesture))
+		if raw_gesture.active_touches == 0: # last finger released
 			if _single_touch_cancelled:
-				var distance : float = (rawGesture.centroid("releases","position") - rawGesture.centroid("presses","position")).length()
-				if rawGesture.elapsed_time < TAP_TIME_LIMIT and distance <= TAP_DISTANCE_LIMIT and\
-					 rawGesture.isConsistent(TAP_DISTANCE_LIMIT, FINGER_SIZE*fingers) and\
-					 _released_together(rawGesture, MULTI_FINGER_REALEASE_THRESHOLD):
-					_emit("multi_tap", InputEventMultiScreenTap.new(rawGesture))
-				if rawGesture.elapsed_time < SWIPE_TIME_LIMIT and distance > SWIPE_DISTANCE_THRESHOLD and\
-					 rawGesture.isConsistent(FINGER_SIZE, FINGER_SIZE*fingers) and\
-					 _released_together(rawGesture, MULTI_FINGER_REALEASE_THRESHOLD):
-					_emit("multi_swipe", InputEventMultiScreenSwipe.new(rawGesture))
+				var distance : float = (raw_gesture.centroid("releases","position") - raw_gesture.centroid("presses","position")).length()
+				if raw_gesture.elapsed_time < TAP_TIME_LIMIT and distance <= TAP_DISTANCE_LIMIT and\
+					 raw_gesture.is_consistent(TAP_DISTANCE_LIMIT, FINGER_SIZE*fingers) and\
+					 _released_together(raw_gesture, MULTI_FINGER_REALEASE_THRESHOLD):
+					_emit("multi_tap", InputEventMultiScreenTap.new(raw_gesture))
+				if raw_gesture.elapsed_time < SWIPE_TIME_LIMIT and distance > SWIPE_DISTANCE_THRESHOLD and\
+					 raw_gesture.is_consistent(FINGER_SIZE, FINGER_SIZE*fingers) and\
+					 _released_together(raw_gesture, MULTI_FINGER_REALEASE_THRESHOLD):
+					_emit("multi_swipe", InputEventMultiScreenSwipe.new(raw_gesture))
 			_end_gesture()
 		_cancel_single_drag()
 
 func _handle_screen_drag(event : InputEventScreenDrag) -> void:
-	_updateRGScreenDrag(rawGesture, event)
-	if rawGesture.drags.size() > 1:
+	raw_gesture._update_screen_drag(event)
+	_emit("raw_gesture", raw_gesture)
+	if raw_gesture.drags.size() > 1:
 		_cancel_single_drag()
-		var gesture : int = _identify_gesture(rawGesture)
+		var gesture : int = _identify_gesture(raw_gesture)
 		if gesture == Gesture.PINCH:
-			_emit("pinch", InputEventScreenPinch.new(rawGesture, event))
+			_emit("pinch", InputEventScreenPinch.new(raw_gesture, event))
 		elif gesture == Gesture.MULTI_DRAG:
-			_emit("multi_drag", InputEventMultiScreenDrag.new(rawGesture, event))
+			_emit("multi_drag", InputEventMultiScreenDrag.new(raw_gesture, event))
 		elif gesture == Gesture.TWIST:
-			_emit("twist",InputEventScreenTwist.new(rawGesture, event))
+			_emit("twist",InputEventScreenTwist.new(raw_gesture, event))
 	else:
 		if _single_drag_enabled:
-			_emit("single_drag", InputEventSingleScreenDrag.new(rawGesture))
+			_emit("single_drag", InputEventSingleScreenDrag.new(raw_gesture))
 		else:
 			if _drag_startup_timer.is_stopped(): _drag_startup_timer.start(DRAG_STARTUP_TIME)
 
@@ -270,16 +272,16 @@ func _cancel_single_drag() -> void:
 	_single_drag_enabled = false
 	_drag_startup_timer.stop()
 
-func _released_together(_rawGesture : RawGesture, threshold : float) -> bool:
-	_rawGesture = _rawGesture.rollback_relative(threshold)[0]
-	return _rawGesture.size() == _rawGesture.active_touches
+func _released_together(_raw_gesture : RawGesture, threshold : float) -> bool:
+	_raw_gesture = _raw_gesture.rollback_relative(threshold)[0]
+	return _raw_gesture.size() == _raw_gesture.active_touches
 
 # Checks if the gesture is pinch
-func _identify_gesture(_rawGesture : RawGesture) -> int:
-	var center : Vector2 = _rawGesture.centroid("drags","position")
+func _identify_gesture(_raw_gesture : RawGesture) -> int:
+	var center : Vector2 = _raw_gesture.centroid("drags","position")
 	
 	var sector : int = -1
-	for e in _rawGesture.drags.values():
+	for e in _raw_gesture.drags.values():
 		var adjusted_position : Vector2 = center - e.position
 		var raw_angle      : float = fmod(adjusted_position.angle_to(e.relative) + (PI/4), TAU) 
 		var adjusted_angle : float = raw_angle if raw_angle >= 0 else raw_angle + TAU
@@ -295,11 +297,11 @@ func _identify_gesture(_rawGesture : RawGesture) -> int:
 		return Gesture.TWIST
 
 func _on_drag_startup_timeout() -> void:
-	_single_drag_enabled = rawGesture.drags.size() == 1
+	_single_drag_enabled = raw_gesture.drags.size() == 1
 
 func _end_gesture() -> void:
 	_single_drag_enabled = false
-	rawGesture = RawGesture.new()
+	raw_gesture = RawGesture.new()
 
 # create a native touch event
 func _native_touch_event(index : int, position : Vector2, pressed : bool) -> InputEventScreenTouch:
@@ -317,14 +319,6 @@ func _native_drag_event(index : int, position : Vector2, relative : Vector2, spe
 	native_drag.relative  = relative 
 	native_drag.speed    = speed
 	return native_drag
-
-func _updateRGScreenTouch(_rawGesture : RawGesture, event : InputEventScreenTouch, time : float = -1):
-	_rawGesture._updateScreenTouch(event,time)
-	_emit("raw_gesture", _rawGesture)
-
-func _updateRGScreenDrag(_rawGesture : RawGesture, event : InputEventScreenDrag, time : float = -1):
-	_rawGesture._updateScreenDrag(event,time)
-	_emit("raw_gesture", _rawGesture)
 
 func _native_mouse_button_event(button : int) -> InputEventMouseButton:
 	var ev = InputEventMouseButton.new()

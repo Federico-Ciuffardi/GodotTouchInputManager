@@ -56,7 +56,7 @@ func centroid(events_id : String , property_id : String):
 	return Util.centroid(arr)
 
 # Check for gesture consistency
-func isConsistent(diff_limit : float, length_limit : float = -1) -> bool:
+func is_consistent(diff_limit : float, length_limit : float = -1) -> bool:
 	if length_limit == -1: length_limit = length_limit
 	var valid : bool = true
 	var i : int = 0
@@ -164,9 +164,9 @@ func as_text() -> String:
 		txt += "("+str(index)+":"+str(releases[index].time)+") "
 	return txt
 
-func _updateScreenDrag(event : InputEventScreenDrag, time : float = -1) -> void:
+func _update_screen_drag(event : InputEventScreenDrag, time : float = -1) -> void:
 	if time < 0:
-		time = Util._now()
+		time = Util.now()
 	var drag : Drag = Drag.new()
 	drag.position  = event.position
 	drag.relative  = event.relative
@@ -177,9 +177,9 @@ func _updateScreenDrag(event : InputEventScreenDrag, time : float = -1) -> void:
 	drags[event.index] = drag
 	elapsed_time = time - start_time
 	
-func _updateScreenTouch(event : InputEventScreenTouch, time : float = -1) -> void:
+func _update_screen_touch(event : InputEventScreenTouch, time : float = -1) -> void:
 	if time < 0:
-		time = Util._now()
+		time = Util.now()
 	var touch : Touch = Touch.new()
 	touch.position = event.position
 	touch.pressed  = event.pressed

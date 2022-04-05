@@ -4,16 +4,16 @@ extends InputEventAction
 var position   : Vector2
 var relative   : Vector2
 var speed      : Vector2
-var rawGesture : RawGesture
+var raw_gesture : RawGesture
 
-func _init(_rawGesture : RawGesture = null) -> void:
-	rawGesture = _rawGesture
-	if rawGesture:
-		var dragEvent = rawGesture.drags.values()[0]
+func _init(_raw_gesture : RawGesture = null) -> void:
+	raw_gesture = _raw_gesture
+	if raw_gesture:
+		var dragEvent = raw_gesture.drags.values()[0]
 		position = dragEvent.position
 		relative = dragEvent.relative
 		speed    = dragEvent.speed
 
 
 func as_text():
-	return "InputEventSingleScreenDrag : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed)
+	return "position=" + str(position) + "|relative=" + str(relative) + "|speed=" + str(speed)
