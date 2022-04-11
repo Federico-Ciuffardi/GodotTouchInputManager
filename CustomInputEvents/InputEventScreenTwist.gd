@@ -3,7 +3,6 @@ extends InputEventAction
 
 var position   : Vector2
 var relative   : float
-var speed      : float
 var fingers    : int
 var raw_gesture : RawGesture
 
@@ -14,8 +13,7 @@ func _init(_raw_gesture : RawGesture = null, event : InputEventScreenDrag = null
 		position = raw_gesture.centroid("drags", "position")
 			
 		var centroid_relative_position = event.position - position
-		speed = event.speed.length()
 		relative = centroid_relative_position.angle_to(centroid_relative_position + event.relative)/fingers
 
 func as_text() -> String:
-	return "position=" + str(position) + "|relative=" + str(relative) + "|speed=" + str(speed) +"|fingers=" + str(fingers)
+	return "position=" + str(position) + "|relative=" + str(relative) + "|fingers=" + str(fingers)

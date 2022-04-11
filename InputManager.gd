@@ -133,7 +133,6 @@ func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 		var multi_drag_event = InputEventMultiScreenDrag.new()
 		multi_drag_event.position = event.position
 		multi_drag_event.relative = event.relative
-		multi_drag_event.speed    = event.speed
 		multi_drag_event.fingers  = 2
 		_emit("multi_drag", multi_drag_event)
 	elif _mouse_event == Gesture.TWIST:
@@ -142,7 +141,6 @@ func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 		var twist_event = InputEventScreenTwist.new()
 		twist_event.position = _mouse_event_press_position
 		twist_event.relative = rel1.angle_to(rel2)
-		twist_event.speed    = twist_event.relative/0.1
 		twist_event.fingers  = 2
 		_emit("twist", twist_event)
 
@@ -228,7 +226,6 @@ func _handle_action(event : InputEvent) -> void:
 		pinch_event.relative = 40
 		if event.is_action_pressed("pinch_down"):
 			pinch_event.relative *= -1
-		pinch_event.speed = pinch_event.relative/0.1
 		_emit("pinch", pinch_event)
 	else:
 		var swipe_emulation_dir  : Vector2 = Vector2.ZERO
@@ -253,7 +250,6 @@ func _handle_action(event : InputEvent) -> void:
 				swipe_event.fingers = 2
 			swipe_event.position = get_viewport().get_mouse_position()
 			swipe_event.relative = swipe_emulation_dir*SWIPE_DISTANCE_THRESHOLD*2
-			swipe_event.speed    = swipe_event.relative/0.1
 			if is_single_swipe:
 				_emit("single_swipe", swipe_event)
 			else:
