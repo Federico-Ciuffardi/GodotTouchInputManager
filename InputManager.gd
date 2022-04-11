@@ -14,13 +14,12 @@ const DRAG_STARTUP_TIME : float = 0.02
 
 const FINGER_SIZE : float = 100.0
 
-const MULTI_FINGER_REALEASE_THRESHOLD : float = 0.1
+const MULTI_FINGER_RELEASE_THRESHOLD : float = 0.1
 
 const TAP_TIME_LIMIT     : float = 0.2
 const TAP_DISTANCE_LIMIT : float = 25.0
 
 const SWIPE_TIME_LIMIT         : float = 0.5
-const SWIPE_DISTANCE_LIMIT     : float = 30.0
 const SWIPE_DISTANCE_THRESHOLD : float = 200.0
 
 #########
@@ -89,29 +88,29 @@ func _ready() -> void:
 	_add_timer(_drag_startup_timer, "_on_drag_startup_timeout")
 
 	if DEFAULT_BINDIGS:
-		_set_default_action("multi_swipe_up"        , _native_key_event(KEY_W))
-		_set_default_action("multi_swipe_up_right"  , _native_key_event(KEY_E))
-		_set_default_action("multi_swipe_right"     , _native_key_event(KEY_D))
-		_set_default_action("multi_swipe_down_right", _native_key_event(KEY_C))
-		_set_default_action("multi_swipe_down"      , _native_key_event(KEY_X))
-		_set_default_action("multi_swipe_down_left" , _native_key_event(KEY_Z))
-		_set_default_action("multi_swipe_left"      , _native_key_event(KEY_A))
-		_set_default_action("multi_swipe_up_left"   , _native_key_event(KEY_Q))
+		_set_default_action("multi_swipe_up"        , _native_key_event(KEY_I))
+		_set_default_action("multi_swipe_up_right"  , _native_key_event(KEY_O))
+		_set_default_action("multi_swipe_right"     , _native_key_event(KEY_L))
+		_set_default_action("multi_swipe_down_right", _native_key_event(KEY_PERIOD))
+		_set_default_action("multi_swipe_down"      , _native_key_event(KEY_COMMA))
+		_set_default_action("multi_swipe_down_left" , _native_key_event(KEY_M))
+		_set_default_action("multi_swipe_left"      , _native_key_event(KEY_J))
+		_set_default_action("multi_swipe_up_left"   , _native_key_event(KEY_U))
 
-		_set_default_action("single_swipe_up"        , _native_key_event(KEY_I))
-		_set_default_action("single_swipe_up_right"  , _native_key_event(KEY_O))
-		_set_default_action("single_swipe_right"     , _native_key_event(KEY_L))
-		_set_default_action("single_swipe_down_right", _native_key_event(KEY_PERIOD))
-		_set_default_action("single_swipe_down"      , _native_key_event(KEY_COMMA))
-		_set_default_action("single_swipe_down_left" , _native_key_event(KEY_M))
-		_set_default_action("single_swipe_left"      , _native_key_event(KEY_J))
-		_set_default_action("single_swipe_up_left"   , _native_key_event(KEY_U))
+		_set_default_action("single_swipe_up"        , _native_key_event(KEY_W))
+		_set_default_action("single_swipe_up_right"  , _native_key_event(KEY_E))
+		_set_default_action("single_swipe_right"     , _native_key_event(KEY_D))
+		_set_default_action("single_swipe_down_right", _native_key_event(KEY_C))
+		_set_default_action("single_swipe_down"      , _native_key_event(KEY_X))
+		_set_default_action("single_swipe_down_left" , _native_key_event(KEY_Z))
+		_set_default_action("single_swipe_left"      , _native_key_event(KEY_A))
+		_set_default_action("single_swipe_up_left"   , _native_key_event(KEY_Q))
 
 		# _set_default_action("single_touch"           , _native_mouse_button_event(BUTTON_LEFT))
 		_set_default_action("multi_touch"              , _native_mouse_button_event(BUTTON_MIDDLE))
 		# _set_default_action("pinch"                  , _native_mouse_button_event(BUTTON_RIGHT)) # TODO
-		_set_default_action("pinch_up"                 , _native_mouse_button_event(BUTTON_WHEEL_UP))
-		_set_default_action("pinch_down"               , _native_mouse_button_event(BUTTON_WHEEL_DOWN))
+		_set_default_action("pinch_outward"            , _native_mouse_button_event(BUTTON_WHEEL_UP))
+		_set_default_action("pinch_inward"             , _native_mouse_button_event(BUTTON_WHEEL_DOWN))
 		_set_default_action("twist"                    , _native_mouse_button_event(BUTTON_RIGHT))
 		# _set_default_action("twist_clockwise"        , _native_mouse_button_event(BUTTON_WHEEL_UP)) # TODO
 		# _set_default_action("twist_counterclockwise" , _native_mouse_button_event(BUTTON_WHEEL_DOWN)) # TODO
@@ -171,11 +170,11 @@ func _handle_screen_touch(event : InputEventScreenTouch) -> void:
 				var distance : float = (raw_gesture.centroid("releases","position") - raw_gesture.centroid("presses","position")).length()
 				if raw_gesture.elapsed_time < TAP_TIME_LIMIT and distance <= TAP_DISTANCE_LIMIT and\
 					 raw_gesture.is_consistent(TAP_DISTANCE_LIMIT, FINGER_SIZE*fingers) and\
-					 _released_together(raw_gesture, MULTI_FINGER_REALEASE_THRESHOLD):
+					 _released_together(raw_gesture, MULTI_FINGER_RELEASE_THRESHOLD):
 					_emit("multi_tap", InputEventMultiScreenTap.new(raw_gesture))
 				if raw_gesture.elapsed_time < SWIPE_TIME_LIMIT and distance > SWIPE_DISTANCE_THRESHOLD and\
 					 raw_gesture.is_consistent(FINGER_SIZE, FINGER_SIZE*fingers) and\
-					 _released_together(raw_gesture, MULTI_FINGER_REALEASE_THRESHOLD):
+					 _released_together(raw_gesture, MULTI_FINGER_RELEASE_THRESHOLD):
 					_emit("multi_swipe", InputEventMultiScreenSwipe.new(raw_gesture))
 			_end_gesture()
 		_cancel_single_drag()
@@ -218,13 +217,13 @@ func _handle_action(event : InputEvent) -> void:
 			_mouse_event = Gesture.TWIST
 		else:
 			_mouse_event = Gesture.NONE
-	elif event.is_action_pressed("pinch_up") or event.is_action_pressed("pinch_down"):
+	elif event.is_action_pressed("pinch_outward") or event.is_action_pressed("pinch_inward"):
 		var pinch_event = InputEventScreenPinch.new()
 		pinch_event.fingers = 2 
-		pinch_event.position = event.position
+		pinch_event.position = get_viewport().get_mouse_position()
 		pinch_event.distance = 400
 		pinch_event.relative = 40
-		if event.is_action_pressed("pinch_down"):
+		if event.is_action_pressed("pinch_inward"):
 			pinch_event.relative *= -1
 		_emit("pinch", pinch_event)
 	else:

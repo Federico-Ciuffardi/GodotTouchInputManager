@@ -50,9 +50,9 @@ var elapsed_time   : float = -1 # (secs)
 func size() -> int:
 	return presses.size()
 
-func centroid(events_id : String , property_id : String):
-	var arr : Array = get(events_id).values()
-	arr = Util.map_callv(arr , "get", [property_id])
+func centroid(events_name : String , property_name : String):
+	var arr : Array = get(events_name).values()
+	arr = Util.map_callv(arr , "get", [property_name])
 	return Util.centroid(arr)
 
 # Check for gesture consistency
