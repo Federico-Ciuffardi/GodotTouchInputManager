@@ -1,4 +1,4 @@
-#warning-ignore:unused_result
+# warning-ignore-all:return_value_discarded
 
 extends InputEventAction
 class_name RawGesture 
