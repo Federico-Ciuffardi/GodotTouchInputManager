@@ -144,7 +144,8 @@ func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 		_emit("twist", twist_event)
 
 func _handle_screen_touch(event : InputEventScreenTouch) -> void:
-	raw_gesture._update_screen_touch(event)
+	if not raw_gesture._update_screen_touch(event):
+		return
 	_emit("raw_gesture", raw_gesture)
 	var index : int = event.index
 	if event.pressed:
