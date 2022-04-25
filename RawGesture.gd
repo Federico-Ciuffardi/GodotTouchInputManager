@@ -177,9 +177,7 @@ func _update_screen_drag(event : InputEventScreenDrag, time : float = -1) -> voi
 	drags[event.index] = drag
 	elapsed_time = time - start_time
 	
-# returns true if the event can be handled, false if it
-# should be skipped.
-func _update_screen_touch(event : InputEventScreenTouch, time : float = -1) -> bool:
+func _update_screen_touch(event : InputEventScreenTouch, time : float = -1) -> void:
 	if time < 0:
 		time = Util.now()
 	var touch : Touch = Touch.new()
@@ -196,14 +194,11 @@ func _update_screen_touch(event : InputEventScreenTouch, time : float = -1) -> b
 		if active_touches == 1:
 			start_time = time
 	else:
-		if not event.index in presses:
-			return false
 		_add_history(event.index, "releases", touch)
 		releases[event.index] = touch
 		active_touches -= 1
 		drags.erase(event.index)
 	elapsed_time = time - start_time
-	return true
 
 func _add_history(index : int, type : String, value) -> void:
 	if !history.has(index): 
