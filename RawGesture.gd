@@ -58,18 +58,19 @@ func centroid(events_name : String , property_name : String):
 # Check for gesture consistency
 func is_consistent(diff_limit : float, length_limit : float = -1) -> bool:
 	if length_limit == -1: length_limit = length_limit
-	var valid : bool = true
-	var i : int = 0
+	var valid : bool
 	var presses_centroid  : Vector2 = centroid("presses", "position")
 	var releases_centroid : Vector2 = centroid("releases", "position")
-	while i < size() and valid:
-		var press_relative_position   : Vector2 = presses[i].position   - presses_centroid
+	for i in releases.keys():
+		var press_relative_position   : Vector2 = presses[i].position  - presses_centroid
 		var release_relative_position : Vector2 = releases[i].position - releases_centroid
 		
 		valid = press_relative_position.length()   < length_limit and \
 						release_relative_position.length() < length_limit and \
 						(release_relative_position - press_relative_position).length() < diff_limit
-		i+=1
+
+		if !valid:
+			break
 
 	return valid
 
