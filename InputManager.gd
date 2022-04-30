@@ -20,6 +20,9 @@ const MULTI_FINGER_RELEASE_THRESHOLD : float = 0.1
 const TAP_TIME_LIMIT     : float = 0.2
 const TAP_DISTANCE_LIMIT : float = 25.0
 
+const LONG_PRESS_TIME_THRESHOLD : float = 0.75
+const LONG_PRESS_DISTANCE_LIMIT : float = 25.0
+
 const SWIPE_TIME_LIMIT         : float = 0.5
 const SWIPE_DISTANCE_THRESHOLD : float = 200.0
 
@@ -52,9 +55,11 @@ signal single_tap
 signal single_touch
 signal single_drag
 signal single_swipe
+signal single_long_press
 signal multi_drag
 signal multi_tap
 signal multi_swipe
+signal multi_long_press
 signal pinch
 signal twist
 signal raw_gesture
@@ -77,6 +82,7 @@ var _mouse_event : int = Gesture.NONE
 
 
 var _drag_startup_timer : Timer = Timer.new()
+var _long_press_timer   : Timer = Timer.new()
 
 var _single_touch_cancelled : bool = false
 var _single_drag_enabled    : bool = false 
@@ -86,7 +92,8 @@ var _single_drag_enabled    : bool = false
 #############
 
 func _ready() -> void:
-	_add_timer(_drag_startup_timer, "_on_drag_startup_timeout")
+	_add_timer(_drag_startup_timer, "_on_drag_startup_timer_timeout")
+	_add_timer(_long_press_timer,   "_on_long_press_timer_timeout")
 
 	if DEFAULT_BINDIGS:
 		_set_default_action("multi_swipe_up"        , _native_key_event(KEY_I))
@@ -130,11 +137,13 @@ func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 	if _mouse_event == Gesture.SINGLE_DRAG:
 	  _emit("drag", _native_drag_event(0, event.position, event.relative, event.speed))
 	elif _mouse_event == Gesture.MULTI_DRAG:
-		var multi_drag_event = InputEventMultiScreenDrag.new()
-		multi_drag_event.position = event.position
-		multi_drag_event.relative = event.relative
-		multi_drag_event.fingers  = 2
-		_emit("multi_drag", multi_drag_event)
+		var offset = Vector2(5,5)
+		var e0 = _native_drag_event(0, event.position-offset, event.relative, event.speed)
+		raw_gesture._update_screen_drag(e0)
+		_emit("multi_drag", InputEventMultiScreenDrag.new(raw_gesture,e0))
+		var e1 = _native_drag_event(1, event.position+offset, event.relative, event.speed)
+		raw_gesture._update_screen_drag(e1)
+		_emit("multi_drag", InputEventMultiScreenDrag.new(raw_gesture,e1))
 	elif _mouse_event == Gesture.TWIST:
 		var rel1 = event.position - _mouse_event_press_position
 		var rel2 = rel1 + event.relative
@@ -155,6 +164,7 @@ func _handle_screen_touch(event : InputEventScreenTouch) -> void:
 	var index : int = event.index
 	if event.pressed:
 		if raw_gesture.size() == 1: # First and only touch
+			_long_press_timer.start(LONG_PRESS_TIME_THRESHOLD)
 			_single_touch_cancelled = false
 			_emit("single_touch", InputEventSingleScreenTouch.new(raw_gesture))
 		elif !_single_touch_cancelled :
@@ -297,11 +307,25 @@ func _identify_gesture(_raw_gesture : RawGesture) -> int:
 	else: # sector == 1 or sector == 3:
 		return Gesture.TWIST
 
-func _on_drag_startup_timeout() -> void:
+func _on_drag_startup_timer_timeout() -> void:
 	_single_drag_enabled = raw_gesture.drags.size() == 1
+
+func _on_long_press_timer_timeout() -> void:
+	var ends_centroid   : Vector2    = Util.centroid(raw_gesture.get_ends().values())
+	var starts_centroid : Vector2    = raw_gesture.centroid("presses", "position")
+	var distance        : float      = (ends_centroid - starts_centroid).length()
+
+	if raw_gesture.releases.empty() and distance <= LONG_PRESS_DISTANCE_LIMIT and\
+		 raw_gesture.is_consistent(LONG_PRESS_DISTANCE_LIMIT, FINGER_SIZE*raw_gesture.size()):
+		if _single_touch_cancelled:
+			_emit("multi_long_press", InputEventMultiScreenLongPress.new(raw_gesture))
+		else:
+			_emit("single_long_press", InputEventSingleScreenLongPress.new(raw_gesture))
+	
 
 func _end_gesture() -> void:
 	_single_drag_enabled = false
+	_long_press_timer.stop()
 	raw_gesture = RawGesture.new()
 
 # create a native touch event

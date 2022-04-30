@@ -55,19 +55,37 @@ func centroid(events_name : String , property_name : String):
 	arr = Util.map_callv(arr , "get", [property_name])
 	return Util.centroid(arr)
 
+func get_ends() -> Dictionary:
+	var ends : Dictionary = {}
+
+	for i in presses:
+		ends[i] = presses[i].position
+
+	for i in drags:
+		ends[i] = drags[i].position
+
+	for i in releases:
+		ends[i] = releases[i].position
+
+	return ends
+
 # Check for gesture consistency
 func is_consistent(diff_limit : float, length_limit : float = -1) -> bool:
 	if length_limit == -1: length_limit = length_limit
-	var valid : bool
-	var presses_centroid  : Vector2 = centroid("presses", "position")
-	var releases_centroid : Vector2 = centroid("releases", "position")
-	for i in releases.keys():
-		var press_relative_position   : Vector2 = presses[i].position  - presses_centroid
-		var release_relative_position : Vector2 = releases[i].position - releases_centroid
+
+	var ends : Dictionary = get_ends()
+
+	var ends_centroid   : Vector2 = Util.centroid(ends.values())
+	var starts_centroid : Vector2 = centroid("presses", "position")
+
+	var valid : bool = true
+	for i in ends:
+		var start_relative_position : Vector2 = presses[i].position  - starts_centroid
+		var end_relative_position   : Vector2 = ends[i] - ends_centroid 
 		
-		valid = press_relative_position.length()   < length_limit and \
-						release_relative_position.length() < length_limit and \
-						(release_relative_position - press_relative_position).length() < diff_limit
+		valid = start_relative_position.length() < length_limit and \
+						end_relative_position.length()   < length_limit and \
+						(end_relative_position - start_relative_position).length() < diff_limit
 
 		if !valid:
 			break
