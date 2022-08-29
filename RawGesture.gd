@@ -7,7 +7,7 @@ class_name RawGesture
 # Const #
 #########
 
-const Util : Object = preload("Util.gd")
+const Util : GDScript = preload("Util.gd")
 
 ###########
 # Classes #
@@ -31,7 +31,7 @@ class Drag:
 	extends Event
 	var position  : Vector2 = Vector2.ZERO
 	var relative  : Vector2 = Vector2.ZERO
-	var speed     : Vector2 = Vector2.ZERO
+	var velocity     : Vector2 = Vector2.ZERO
 
 	func as_text() -> String:
 		return .as_text() + " | pos: " + str(position) + " | relative: " + str(relative)
@@ -197,7 +197,7 @@ func _update_screen_drag(event : InputEventScreenDrag, time : float = -1) -> voi
 	var drag : Drag = Drag.new()
 	drag.position  = event.position
 	drag.relative  = event.relative
-	drag.speed     = event.speed
+	drag.velocity  = event.velocity
 	drag.index     = event.index 
 	drag.time      = time
 	_add_history(event.index, "drags", drag)

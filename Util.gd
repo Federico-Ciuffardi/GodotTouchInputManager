@@ -14,4 +14,4 @@ static func centroid(es : Array):
 	return sum / es.size()
 
 static func now() -> float:
-	return float(OS.get_ticks_usec())/SEC_IN_USEC
+	return float(Time.get_ticks_usec())/SEC_IN_USEC
