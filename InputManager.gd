@@ -134,16 +134,16 @@ func _unhandled_input(event : InputEvent) -> void:
 		_handle_action(event)
 		
 func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
-	if _mouse_event == Gesture.SINGLE_DRAG:
+	if raw_gesture.size() == 1 and _mouse_event == Gesture.SINGLE_DRAG:
 	  _emit("drag", _native_drag_event(0, event.position, event.relative, event.speed))
-	elif _mouse_event == Gesture.MULTI_DRAG:
-		var offset = Vector2(5,5)
-		var e0 = _native_drag_event(0, event.position-offset, event.relative, event.speed)
-		raw_gesture._update_screen_drag(e0)
-		_emit("multi_drag", InputEventMultiScreenDrag.new(raw_gesture,e0))
-		var e1 = _native_drag_event(1, event.position+offset, event.relative, event.speed)
-		raw_gesture._update_screen_drag(e1)
-		_emit("multi_drag", InputEventMultiScreenDrag.new(raw_gesture,e1))
+	elif raw_gesture.size() == 2 and _mouse_event == Gesture.MULTI_DRAG:
+			var offset = Vector2(5,5)
+			var e0 = _native_drag_event(0, event.position-offset, event.relative, event.speed)
+			raw_gesture._update_screen_drag(e0)
+			var e1 = _native_drag_event(1, event.position+offset, event.relative, event.speed)
+			raw_gesture._update_screen_drag(e1)
+			_emit("multi_drag", InputEventMultiScreenDrag.new(raw_gesture,e0))
+			_emit("multi_drag", InputEventMultiScreenDrag.new(raw_gesture,e1))
 	elif _mouse_event == Gesture.TWIST:
 		var rel1 = event.position - _mouse_event_press_position
 		var rel2 = rel1 + event.relative
