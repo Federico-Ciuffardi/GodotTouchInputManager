@@ -135,7 +135,7 @@ func _unhandled_input(event : InputEvent) -> void:
 		
 func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 	if _mouse_event == Gesture.SINGLE_DRAG:
-	  _emit("drag", _native_drag_event(0, event.position, event.relative, event.velocity))
+		_emit("drag", _native_drag_event(0, event.position, event.relative, event.velocity))
 	elif _mouse_event == Gesture.MULTI_DRAG:
 		var offset = Vector2(5,5)
 		var e0 = _native_drag_event(0, event.position-offset, event.relative, event.velocity)
@@ -185,12 +185,12 @@ func _handle_screen_touch(event : InputEventScreenTouch) -> void:
 			if _single_touch_cancelled:
 				var distance : float = (raw_gesture_data.centroid("releases","position") - raw_gesture_data.centroid("presses","position")).length()
 				if raw_gesture_data.elapsed_time < TAP_TIME_LIMIT and distance <= TAP_DISTANCE_LIMIT and\
-					 raw_gesture_data.is_consistent(TAP_DISTANCE_LIMIT, FINGER_SIZE*fingers) and\
-					 _released_together(raw_gesture_data, MULTI_FINGER_RELEASE_THRESHOLD):
+					raw_gesture_data.is_consistent(TAP_DISTANCE_LIMIT, FINGER_SIZE*fingers) and\
+					_released_together(raw_gesture_data, MULTI_FINGER_RELEASE_THRESHOLD):
 					_emit("multi_tap", InputEventMultiScreenTap.new(raw_gesture_data))
 				if raw_gesture_data.elapsed_time < SWIPE_TIME_LIMIT and distance > SWIPE_DISTANCE_THRESHOLD and\
-					 raw_gesture_data.is_consistent(FINGER_SIZE, FINGER_SIZE*fingers) and\
-					 _released_together(raw_gesture_data, MULTI_FINGER_RELEASE_THRESHOLD):
+					raw_gesture_data.is_consistent(FINGER_SIZE, FINGER_SIZE*fingers) and\
+					_released_together(raw_gesture_data, MULTI_FINGER_RELEASE_THRESHOLD):
 					_emit("multi_swipe", InputEventMultiScreenSwipe.new(raw_gesture_data))
 			_end_gesture()
 		_cancel_single_drag()
@@ -315,8 +315,8 @@ func _on_long_press_timer_timeout() -> void:
 	var starts_centroid : Vector2    = raw_gesture_data.centroid("presses", "position")
 	var distance        : float      = (ends_centroid - starts_centroid).length()
 
-	if raw_gesture_data.releases.empty() and distance <= LONG_PRESS_DISTANCE_LIMIT and\
-		 raw_gesture_data.is_consistent(LONG_PRESS_DISTANCE_LIMIT, FINGER_SIZE*raw_gesture_data.size()):
+	if raw_gesture_data.releases.is_empty() and distance <= LONG_PRESS_DISTANCE_LIMIT and\
+		raw_gesture_data.is_consistent(LONG_PRESS_DISTANCE_LIMIT, FINGER_SIZE*raw_gesture_data.size()):
 		if _single_touch_cancelled:
 			_emit("multi_long_press", InputEventMultiScreenLongPress.new(raw_gesture_data))
 		else:
@@ -352,7 +352,7 @@ func _native_mouse_button_event(button : int) -> InputEventMouseButton:
 
 func _native_key_event(key : int) -> InputEventKey:
 	var ev = InputEventKey.new()
-	ev.scancode = key
+	ev.keycode = key
 	return ev
 
 func _set_default_action(action : String, event : InputEvent) -> void:

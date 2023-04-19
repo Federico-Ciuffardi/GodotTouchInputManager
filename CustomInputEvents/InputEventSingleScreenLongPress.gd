@@ -24,7 +24,7 @@ func _init(_raw_gesture : RawGesture = null) -> void:
 			var error_msg="Hello! we are trying to fix this bug.\nTo help us please copy the output and comment it (attached as a file) in the following issue: https://github.com/Federico-Ciuffardi/GodotTouchInputManager/issues/20\nAlso, if you can, include in that comment what version of Godot you are using, what platform you are running on, and what you were doing when the error occurred.\nThanks!"
 			print(error_msg)
 			
-			assert(false,error_msg_short)
+			assert(false, error_msg_short)
 		position = raw_gesture.presses[0].position
 
 
