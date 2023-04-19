@@ -158,6 +158,9 @@ func rollback_absolute(time : float) -> Array:
 
 	return [rg, discarded_events]
 
+func get_linear_event_history():
+	return rollback_absolute(0)[1]
+
 func copy() -> RawGesture:
 	var rg : RawGesture = get_script().new()
 	rg.presses           = presses.duplicate(true)        
