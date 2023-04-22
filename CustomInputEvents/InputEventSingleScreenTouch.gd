@@ -15,5 +15,5 @@ func _init(_raw_gesture : RawGesture = null) -> void:
 			position = raw_gesture.releases.values()[0].position
 		canceled = raw_gesture.size() > 1
 
-func as_text() -> String:
+func as_string() -> String:
 	return "position=" + str(position) + "|pressed=" + str(pressed) + "|canceled=" + str(canceled)

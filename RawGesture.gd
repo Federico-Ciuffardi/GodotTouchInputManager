@@ -16,15 +16,15 @@ const Util : GDScript = preload("Util.gd")
 class Event:
 	var time  : float = -1 # (secs)
 	var index : int   = -1
-	func as_text() -> String:
+	func as_string() -> String:
 		return "ind: " + str(index) + " | time: " + str(time)
 
 class Touch:
 	extends Event
 	var position : Vector2 = Vector2.ZERO
 	var pressed  : bool 
-	func as_text() -> String:
-		return super.as_text() + " | pos: " + str(position) + " | pressed: " + str(pressed)
+	func as_string() -> String:
+		return super.as_string() + " | pos: " + str(position) + " | pressed: " + str(pressed)
 
 
 class Drag:
@@ -33,8 +33,8 @@ class Drag:
 	var relative  : Vector2 = Vector2.ZERO
 	var velocity     : Vector2 = Vector2.ZERO
 
-	func as_text() -> String:
-		return super.as_text() + " | pos: " + str(position) + " | relative: " + str(relative)
+	func as_string() -> String:
+		return super.as_string() + " | pos: " + str(position) + " | relative: " + str(relative)
 
 
 #############
@@ -182,16 +182,16 @@ func latest_event_id(latest_time : float = -1) -> Array:
 				latest_time = event_time
 	return res
 
-func as_text() -> String:
+func as_string() -> String:
 	var txt = "presses: "
 	for e in presses.values():
-		txt += "\n" + e.as_text()
+		txt += "\n" + e.as_string()
 	txt += "\ndrags: "
 	for e in drags.values():
-		txt += "\n" + e.as_text()
+		txt += "\n" + e.as_string()
 	txt += "\nreleases: "
 	for e in releases.values():
-		txt += "\n" + e.as_text()
+		txt += "\n" + e.as_string()
 	return txt
 
 func _update_screen_drag(event : InputEventScreenDrag, time : float = -1) -> void:

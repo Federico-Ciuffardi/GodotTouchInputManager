@@ -24,5 +24,5 @@ func _init(_raw_gesture : RawGesture = null) -> void:
 		position = raw_gesture.presses.values()[0].position
 
 
-func as_text() -> String:
+func as_string() -> String:
 	return "position=" + str(position)

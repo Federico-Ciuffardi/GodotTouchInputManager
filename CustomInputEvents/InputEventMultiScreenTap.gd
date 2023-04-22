@@ -11,5 +11,5 @@ func _init(_raw_gesture : RawGesture = null) -> void:
 		fingers = raw_gesture.size()
 		position = raw_gesture.centroid("presses", "position")
 
-func as_text() -> String:
+func as_string() -> String:
 	return "position=" + str(position) + "|fingers=" + str(fingers)

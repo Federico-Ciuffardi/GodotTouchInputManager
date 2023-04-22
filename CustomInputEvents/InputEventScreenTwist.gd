@@ -15,5 +15,5 @@ func _init(_raw_gesture : RawGesture = null, event : InputEventScreenDrag = null
 		var centroid_relative_position = event.position - position
 		relative = centroid_relative_position.angle_to(centroid_relative_position + event.relative)/fingers
 
-func as_text() -> String:
+func as_string() -> String:
 	return "position=" + str(position) + "|relative=" + str(relative) + "|fingers=" + str(fingers)

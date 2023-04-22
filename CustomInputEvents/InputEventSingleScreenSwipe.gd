@@ -12,5 +12,5 @@ func _init(_raw_gesture : RawGesture = null) -> void:
 		relative = raw_gesture.releases[0].position - position
 
 
-func as_text() -> String:
+func as_string() -> String:
 	return "position=" + str(position) + "|relative=" + str(relative)

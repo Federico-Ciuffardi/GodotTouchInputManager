@@ -13,5 +13,5 @@ func _init(_raw_gesture : RawGesture = null) -> void:
 		position = raw_gesture.centroid("presses", "position")
 		relative = raw_gesture.centroid("releases", "position") - position
 
-func as_text() -> String:
+func as_string() -> String:
 	return "position=" + str(position) + "|relative=" + str(relative) + "|fingers=" + str(fingers)
