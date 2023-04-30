@@ -12,5 +12,5 @@ func _init(_raw_gesture : RawGesture = null) -> void:
 		position = dragEvent.position
 		relative = dragEvent.relative
 
-func as_text():
+func as_string():
 	return "position=" + str(position) + "|relative=" + str(relative)

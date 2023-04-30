@@ -7,7 +7,7 @@ class_name RawGesture
 # Const #
 #########
 
-const Util : Object = preload("Util.gd")
+const Util : GDScript = preload("Util.gd")
 
 ###########
 # Classes #
@@ -16,25 +16,25 @@ const Util : Object = preload("Util.gd")
 class Event:
 	var time  : float = -1 # (secs)
 	var index : int   = -1
-	func as_text() -> String:
+	func as_string() -> String:
 		return "ind: " + str(index) + " | time: " + str(time)
 
 class Touch:
 	extends Event
 	var position : Vector2 = Vector2.ZERO
 	var pressed  : bool 
-	func as_text() -> String:
-		return .as_text() + " | pos: " + str(position) + " | pressed: " + str(pressed)
+	func as_string() -> String:
+		return super.as_string() + " | pos: " + str(position) + " | pressed: " + str(pressed)
 
 
 class Drag:
 	extends Event
 	var position  : Vector2 = Vector2.ZERO
 	var relative  : Vector2 = Vector2.ZERO
-	var speed     : Vector2 = Vector2.ZERO
+	var velocity     : Vector2 = Vector2.ZERO
 
-	func as_text() -> String:
-		return .as_text() + " | pos: " + str(position) + " | relative: " + str(relative)
+	func as_string() -> String:
+		return super.as_string() + " | pos: " + str(position) + " | relative: " + str(relative)
 
 
 #############
@@ -108,7 +108,7 @@ func rollback_absolute(time : float) -> Array:
 	var rg : RawGesture = copy()
 
 	var latest_event_id : Array = rg.latest_event_id(time)
-	while !latest_event_id.empty():
+	while !latest_event_id.is_empty():
 		var latest_index  : int    = latest_event_id[0]
 		var latest_type   : String = latest_event_id[1]
 		var latest_event = rg.history[latest_index][latest_type].pop_back()
@@ -117,9 +117,9 @@ func rollback_absolute(time : float) -> Array:
 			rg.active_touches -= 1
 		elif latest_type == "releases":
 			rg.active_touches += 1
-		if rg.history[latest_index][latest_type].empty():
+		if rg.history[latest_index][latest_type].is_empty():
 			rg.history[latest_index].erase(latest_type)
-			if rg.history[latest_index].empty():
+			if rg.history[latest_index].is_empty():
 				rg.history.erase(latest_index)
 		latest_event_id = rg.latest_event_id(time)
 
@@ -182,16 +182,16 @@ func latest_event_id(latest_time : float = -1) -> Array:
 				latest_time = event_time
 	return res
 
-func as_text() -> String:
+func as_string() -> String:
 	var txt = "presses: "
 	for e in presses.values():
-		txt += "\n" + e.as_text()
+		txt += "\n" + e.as_string()
 	txt += "\ndrags: "
 	for e in drags.values():
-		txt += "\n" + e.as_text()
+		txt += "\n" + e.as_string()
 	txt += "\nreleases: "
 	for e in releases.values():
-		txt += "\n" + e.as_text()
+		txt += "\n" + e.as_string()
 	return txt
 
 func _update_screen_drag(event : InputEventScreenDrag, time : float = -1) -> void:
@@ -200,7 +200,7 @@ func _update_screen_drag(event : InputEventScreenDrag, time : float = -1) -> voi
 	var drag : Drag = Drag.new()
 	drag.position  = event.position
 	drag.relative  = event.relative
-	drag.speed     = event.speed
+	drag.velocity  = event.velocity
 	drag.index     = event.index 
 	drag.time      = time
 	_add_history(event.index, "drags", drag)
