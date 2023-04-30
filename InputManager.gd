@@ -63,6 +63,7 @@ signal multi_long_press
 signal pinch
 signal twist
 signal raw_gesture
+signal cancel
 signal any_gesture
 
 ########
@@ -154,6 +155,10 @@ func _handle_mouse_motion(event : InputEventMouseMotion) -> void:
 		_emit("twist", twist_event)
 
 func _handle_screen_touch(event : InputEventScreenTouch) -> void:
+	if event.index < 0:
+		_emit("cancel", InputEventScreenCancel.new(raw_gesture_data, event))
+		_end_gesture()
+		return
 
 	# ignore orphaned touch release events
 	if !event.pressed and not event.index in raw_gesture_data.presses:
@@ -196,6 +201,11 @@ func _handle_screen_touch(event : InputEventScreenTouch) -> void:
 		_cancel_single_drag()
 
 func _handle_screen_drag(event : InputEventScreenDrag) -> void:
+	if event.index < 0:
+		_emit("cancel", InputEventScreenCancel.new(raw_gesture_data, event))
+		_end_gesture()
+		return
+
 	raw_gesture_data._update_screen_drag(event)
 	_emit("raw_gesture", raw_gesture_data)
 	if raw_gesture_data.drags.size() > 1:
