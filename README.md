@@ -1,15 +1,15 @@
 <img src="https://i.imgur.com/HxwBAK2.png" align="right" />
 
 # Godot Touch Input Manager
-Godot Touch Input Manager (GDTIM) is an asset that improves touch input support (includes [new gestures](#supported-gestures)) in the Godot game engine. You just need to autoload a script and it will start analyzing the touch input. When a gesture is detected a Custom Input Event corresponding to the detected gesture will be created and [fed up](https://docs.godotengine.org/en/stable/classes/class_input.html#class-input-method-parse-input-event) to the Godot built in Input Event system so it triggers functions like [`_input(InputEvent event)`](https://docs.godotengine.org/en/stable/classes/class_node.html#class-node-method-input). There is also a signal for each gesture if you prefer using signals to the aforementioned. 
+Godot Touch Input Manager (GDTIM) is an asset that improves touch input support (includes [new gestures](#supported-gestures)) in the Godot game engine. You just need to autoload a script and it will start analyzing the touch input. When a gesture is detected a Custom Input Event corresponding to the detected gesture will be created and [fed up](https://docs.godotengine.org/en/stable/classes/class_input.html#class-input-method-parse-input-event) to the Godot built in Input Event system so it triggers functions like [`_input(InputEvent event)`](https://docs.godotengine.org/en/stable/classes/class_node.html#class-node-method-input). There is also a signal for each gesture if you prefer using signals to the aforementioned.
 
-This asset was ported to be added to Godot and is now a milestone for version 4.0 ([PR](https://github.com/godotengine/godot/pull/36953)).
+There are two active PRs that add some GDTIM gestures as native Godot events, one for [version 3.X](https://github.com/godotengine/godot/pull/37754) and one for [version 4.X](https://github.com/godotengine/godot/pull/39055), if you are interested, please show your support there.
 
 ## How to use
 * Download the latest release from https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager/releases
 * Extract the downloaded *.zip* file somewhere in you project
 * Locate the extracted `InputManager.gd`, and [Autoload](https://docs.godotengine.org/en/3.4/tutorials/scripting/singletons_autoload.html) it.
-* Done! Now you can use the GodotTouchInputManager's [signals and its Custom Input Events](#supported-gestures).
+* Done! Now you can use GDTIM [signals and Custom Input Events](#supported-gestures).
 
 ## Examples
 ### [GodotTouchInputManager-Demo](https://github.com/Federico-Ciuffardi/GodotTouchInputManager-Demo)
@@ -100,6 +100,19 @@ values on the script.
 | SWIPE_DISTANCE_THRESHOLD       | 200.0         | The centroid of the finger presses must differ by more than `SWIPE_DISTANCE_THRESHOLD` pixels from the centroid of the finger releases for the [single finger swipe](#supported-gestures) and [multiple finger swipe](#supported-gestures) gestures to be recognized.                |
 | LONG_PRESS_TIME_THRESHOLD      | 0.75          | The fingers must press for `LONG_PRESS_TIME_THRESHOLD` seconds for [single-finger long press](#gestures-supported) and [multi-finger long press](#gestures-supported) gestures to be recognized.                                                                                     |
 | LONG_PRESS_DISTANCE_LIMIT      | 25.0          | The centroid of the finger presses must differ less than `LONG_PRESS_DISTANCE_LIMIT` pixels from the centroid of the fingers last positions for the [single finger long press](#supported-gestures) and [multiple finger long press](#supported-gestures) gestures to be recognized. |
+
+## FAQ
+### How can I get GDTIM to work when using control nodes?
+
+By default, the control nodes consume events and therefore GDTIM cannot analyze them. To prevent this, set `Mouse>Filter` to `Ignore` on control nodes as needed.
+
+![image](https://user-images.githubusercontent.com/45585143/235382152-1c99f7eb-eed3-4f96-b1b2-ba0a899d5225.png)
+
+For more information see the [documentation](https://docs.godotengine.org/en/stable/classes/class_control.html#enum-control-mousefilter).
+
+### GDTIM events don't trigger collisions, is there a way to fix it?
+
+Custom input events do not trigger collisions, at the moment the solution is to manually check for collisions between shapes and events. For more information and ideas on how to do this see [this issue](https://github.com/Federico-Ciuffardi/GodotTouchInputManager/issues/16).
 
 
 ## Versioning
