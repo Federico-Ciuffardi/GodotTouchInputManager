@@ -3,7 +3,7 @@
 # Godot Touch Input Manager
 Godot Touch Input Manager (GDTIM) is an asset that improves touch input support (includes [new gestures](#supported-gestures)) in the Godot game engine. You just need to autoload a script and it will start analyzing the touch input. When a gesture is detected a Custom Input Event corresponding to the detected gesture will be created and [fed up](https://docs.godotengine.org/en/stable/classes/class_input.html#class-input-method-parse-input-event) to the Godot built in Input Event system so it triggers functions like [`_input(InputEvent event)`](https://docs.godotengine.org/en/stable/classes/class_node.html#class-node-method-input). There is also a signal for each gesture if you prefer using signals to the aforementioned.
 
-There are two active PRs that add some GDTIM gestures as native Godot events, one for [version 3.X](https://github.com/godotengine/godot/pull/37754) and one for [version 4.X](https://github.com/godotengine/godot/pull/39055), if you are interested, please show your support there.
+There are two active PRs that add some GDTIM gestures as native Godot events, one for [version 3.x](https://github.com/godotengine/godot/pull/37754) and one for [version 4.x](https://github.com/godotengine/godot/pull/39055), if you are interested, please show your support there.
 
 ## Table of contents
 * [How to use](#how-to-use)
