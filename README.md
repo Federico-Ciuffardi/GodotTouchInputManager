@@ -5,6 +5,12 @@ Godot Touch Input Manager (GDTIM) is an asset that improves touch input support 
 
 There are two active PRs that add some GDTIM gestures as native Godot events, one for [version 3.X](https://github.com/godotengine/godot/pull/37754) and one for [version 4.X](https://github.com/godotengine/godot/pull/39055), if you are interested, please show your support there.
 
+## Table of contents
+* [How to use](#how-to-use)
+* [Examples](#examples)
+* [Documentation](#documentation)
+* [FAQ](#faq)
+
 ## How to use
 * Download the latest release from https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager/releases
 * Extract the downloaded *.zip* file somewhere in you project
@@ -114,7 +120,6 @@ For more information see the [documentation](https://docs.godotengine.org/en/sta
 
 Custom input events do not trigger collisions, at the moment the solution is to manually check for collisions between shapes and events. For more information and ideas on how to do this see [this issue](https://github.com/Federico-Ciuffardi/GodotTouchInputManager/issues/16).
 
-
 ## Versioning
 Using [SemVer](http://semver.org/) for versioning. For the versions available, see the [releases](https://github.com/Federico-Ciuffardi/Godot-Touch-Input-Manager/releases).
 
@@ -127,5 +132,3 @@ Feel free to append yourself here if you've made contributions.
 Thank you for checking out this repository, you can send all your questions and comments to Federico.Ciuffardi@outlook.com.
 
 If you are willing to contribute in any way, please contact me.
-
-
