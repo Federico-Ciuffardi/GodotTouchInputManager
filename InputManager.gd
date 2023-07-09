@@ -92,6 +92,8 @@ var _single_drag_enabled    : bool = false
 #############
 
 func _ready() -> void:
+	pause_mode = Node.PAUSE_MODE_PROCESS # Emit events even if the scene tree is paused
+
 	_add_timer(_drag_startup_timer, "_on_drag_startup_timer_timeout")
 	_add_timer(_long_press_timer,   "_on_long_press_timer_timeout")
 
