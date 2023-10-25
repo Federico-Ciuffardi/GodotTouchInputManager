@@ -58,9 +58,13 @@ var elapsed_time   : float = -1 # (secs)
 func size() -> int:
 	return presses.size()
 
-func centroid(events_name : String , property_name : String):
+func get_property_array(events_name : String , property_name : String):
 	var arr : Array = get(events_name).values()
 	arr = Util.map_callv(arr , "get", [property_name])
+	return arr
+
+func centroid(events_name : String , property_name : String):
+	var arr : Array = get_property_array(events_name, property_name)
 	return Util.centroid(arr)
 
 func get_ends() -> Dictionary:
