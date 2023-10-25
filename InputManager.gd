@@ -65,6 +65,7 @@ signal twist
 signal raw_gesture
 signal cancel
 signal any_gesture
+signal any_tap
 
 ########
 # Enum #
@@ -186,6 +187,7 @@ func _handle_screen_touch(event : InputEventScreenTouch) -> void:
 				var distance : float = (raw_gesture_data.releases[0].position - raw_gesture_data.presses[0].position).length()
 				if raw_gesture_data.elapsed_time < TAP_TIME_LIMIT and distance <= TAP_DISTANCE_LIMIT:
 					_emit("single_tap", InputEventSingleScreenTap.new(raw_gesture_data))
+					_emit("any_tap", InputEventMultiScreenTap.new(raw_gesture_data))
 				if raw_gesture_data.elapsed_time < SWIPE_TIME_LIMIT and distance > SWIPE_DISTANCE_THRESHOLD:
 					_emit("single_swipe", InputEventSingleScreenSwipe.new(raw_gesture_data))
 		if raw_gesture_data.active_touches == 0: # last finger released
@@ -195,6 +197,7 @@ func _handle_screen_touch(event : InputEventScreenTouch) -> void:
 					raw_gesture_data.is_consistent(TAP_DISTANCE_LIMIT, FINGER_SIZE*fingers) and\
 					_released_together(raw_gesture_data, MULTI_FINGER_RELEASE_THRESHOLD):
 					_emit("multi_tap", InputEventMultiScreenTap.new(raw_gesture_data))
+					_emit("any_tap", InputEventMultiScreenTap.new(raw_gesture_data))
 				if raw_gesture_data.elapsed_time < SWIPE_TIME_LIMIT and distance > SWIPE_DISTANCE_THRESHOLD and\
 					raw_gesture_data.is_consistent(FINGER_SIZE, FINGER_SIZE*fingers) and\
 					_released_together(raw_gesture_data, MULTI_FINGER_RELEASE_THRESHOLD):
