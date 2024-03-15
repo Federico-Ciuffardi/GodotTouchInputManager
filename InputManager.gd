@@ -167,7 +167,7 @@ func _handle_screen_touch(event : InputEventScreenTouch) -> void:
 		return
 
 	raw_gesture_data._update_screen_touch(event)
-	_emit("raw_gesture", raw_gesture_data)
+	_emit("raw_gesture", raw_gesture_data.duplicate())
 	var index : int = event.index
 	if event.pressed:
 		if raw_gesture_data.size() == 1: # First and only touch
@@ -209,7 +209,7 @@ func _handle_screen_drag(event : InputEventScreenDrag) -> void:
 		return
 
 	raw_gesture_data._update_screen_drag(event)
-	_emit("raw_gesture", raw_gesture_data)
+	_emit("raw_gesture", raw_gesture_data.duplicate())
 	if raw_gesture_data.drags.size() > 1:
 		_cancel_single_drag()
 		var gesture : int = _identify_gesture(raw_gesture_data)
