@@ -126,7 +126,7 @@ func _ready() -> void:
 		# _set_default_action("twist_clockwise"        , _native_mouse_button_event(MOUSE_BUTTON_WHEEL_UP)) # TODO
 		# _set_default_action("twist_counterclockwise" , _native_mouse_button_event(MOUSE_BUTTON_WHEEL_DOWN)) # TODO
 
-func _unhandled_input(event : InputEvent) -> void:
+func _input(event : InputEvent) -> void:
 	if event is InputEventScreenDrag:
 		_handle_screen_drag(event)
 	elif event is InputEventScreenTouch:
