@@ -284,7 +284,7 @@ func _handle_action(event : InputEvent) -> void:
 
 # Emits signal sig with the specified args
 func _emit(sig : String, val : InputEvent) -> void:
-	if DEBUG: print(val.as_text())
+	if DEBUG: print(val.as_string())
 	emit_signal("any_gesture", sig, val)
 	emit_signal(sig, val)
 	Input.parse_input_event(val)
