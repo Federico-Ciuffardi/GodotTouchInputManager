@@ -111,7 +111,7 @@ func rollback_absolute(time : float) -> Array:
 	var discarded_events : Array = []
 	var rg : RawGesture = copy()
 
-	var latest_event_id : Array = rg.latest_event_id(time)
+	var latest_event_id : Array = rg.get_latest_event_id(time)
 	while !latest_event_id.is_empty():
 		var latest_index  : int    = latest_event_id[0]
 		var latest_type   : String = latest_event_id[1]
@@ -176,7 +176,7 @@ func copy() -> RawGesture:
 	rg.elapsed_time      = elapsed_time 
 	return rg 
 
-func latest_event_id(latest_time : float = -1) -> Array:
+func get_latest_event_id(latest_time : float = -1) -> Array:
 	var res : Array = []
 	for index in history:
 		for type in history[index]:

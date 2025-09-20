@@ -15,8 +15,8 @@ func _init(_raw_gesture : RawGesture = null, event : InputEventScreenDrag = null
 
 		distance = 0
 		for drag in raw_gesture.drags.values():
-			var centroid_relative_position = drag.position - position
-			distance += centroid_relative_position.length()
+			var _centroid_relative_position = drag.position - position
+			distance += _centroid_relative_position.length()
 
 		var centroid_relative_position = event.position - position
 		relative = ((centroid_relative_position + event.relative).length() - centroid_relative_position.length())
