@@ -5,6 +5,23 @@ Godot Touch Input Manager (GDTIM) is an asset that improves touch input support 
 
 There are two active PRs that add some GDTIM gestures as native Godot events, one for [version 3.x](https://github.com/godotengine/godot/pull/37754) and one for [version 4.x](https://github.com/godotengine/godot/pull/39055), if you are interested, please show your support there.
 
+## Sponsored by
+
+<a href="https://play.google.com/store/apps/details?id=com.bitknit.scoundrelcats&hl=en">
+  <img src="https://play-lh.googleusercontent.com/oKHmbpav8elcGyGC0sdmwK7abrIhT9ZLi5KUs0A_YQCEVMKO0uDGV2DGqyJGGN-AaivYhJKhWZCIP8AAQQzk=w120-h120" align="left" width="110" />
+</a>
+
+**[Scoundrel Cats](https://play.google.com/store/apps/details?id=com.bitknit.scoundrelcats&hl=en)**<br>
+A roguelike card game that's simple to learn, but hard to master. Can you escape the alley?
+
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.bitknit.scoundrelcats&hl=en">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="140" />
+  </a>
+</p>
+
+<br clear="left" />
+
 ## Table of contents
 * [How to use](#how-to-use)
 * [Examples](#examples)
